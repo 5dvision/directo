@@ -1,0 +1,72 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * CLI tool to download/update Directo XMLCore XSD schemas.
+ *
+ * Usage:
+ *   bin/directo-schemas          Download all schemas
+ *   composer schemas:update      Same, via composer script
+ *
+ * Schemas are saved to resources/xsd/ directory.
+ */
+
+// Find autoloader
+$autoloadPaths = [
+    __DIR__ . '/../vendor/autoload.php',       // When running from package root
+    __DIR__ . '/../../../autoload.php',        // When installed as dependency
+];
+
+$autoloaderFound = false;
+foreach ($autoloadPaths as $autoloadPath) {
+    if (file_exists($autoloadPath)) {
+        require $autoloadPath;
+        $autoloaderFound = true;
+        break;
+    }
+}
+
+if (!$autoloaderFound) {
+    fwrite(STDERR, "Error: Could not find Composer autoloader.\n");
+    fwrite(STDERR, "Please run 'composer install' first.\n");
+    exit(1);
+}
+
+use Directo\Config;
+use Directo\Schema\SchemaDownloader;
+
+// Use Config for defaults - token not needed for schema download
+$outputPath = dirname(__DIR__) . '/resources/xsd';
+$schemaBaseUrl = Config::DEFAULT_SCHEMA_BASE_URL;
+
+echo "Directo Schema Downloader\n";
+echo "=========================\n\n";
+echo "Output directory: {$outputPath}\n";
+echo "Schema URL: {$schemaBaseUrl}\n\n";
+
+$downloader = new SchemaDownloader($outputPath, $schemaBaseUrl);
+
+$logger = function (string $message): void {
+    echo $message . "\n";
+};
+
+$results = $downloader->downloadAll($logger);
+
+echo "\n";
+echo "Summary:\n";
+echo "--------\n";
+echo sprintf("  Success: %d\n", count($results['success']));
+echo sprintf("  Failed:  %d\n", count($results['failed']));
+
+if (!empty($results['failed'])) {
+    echo "\nFailed downloads:\n";
+    foreach ($results['failed'] as $what => $error) {
+        echo "  - {$what}: {$error}\n";
+    }
+    exit(1);
+}
+
+echo "\nAll schemas downloaded successfully.\n";
+exit(0);

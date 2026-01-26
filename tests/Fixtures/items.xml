@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<results>
+    <item>
+        <kood>ITEM001</kood>
+        <nimetus>Test Product</nimetus>
+        <nimetus2>Alternative Name</nimetus2>
+        <klass>ELECTRONICS</klass>
+        <yksus>pcs</yksus>
+        <ribakood>4751234567890</ribakood>
+        <hind>99.99</hind>
+        <kaal>0.5</kaal>
+        <maht>0.001</maht>
+        <tarnija>SUPP001</tarnija>
+        <tarnija_artikkel>SP-12345</tarnija_artikkel>
+        <suletud>0</suletud>
+    </item>
+    <item>
+        <kood>ITEM002</kood>
+        <nimetus>Another Product</nimetus>
+        <nimetus2></nimetus2>
+        <klass>FURNITURE</klass>
+        <yksus>pcs</yksus>
+        <ribakood>4759876543210</ribakood>
+        <hind>249.00</hind>
+        <kaal>15.0</kaal>
+        <maht>0.5</maht>
+        <tarnija>SUPP002</tarnija>
+        <tarnija_artikkel>FN-67890</tarnija_artikkel>
+        <suletud>0</suletud>
+    </item>
+</results>

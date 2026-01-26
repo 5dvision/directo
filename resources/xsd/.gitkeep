@@ -1,0 +1,24 @@
+# XSD Schemas
+
+This directory contains XSD schemas for validating Directo XMLCore API responses.
+
+## Updating Schemas
+
+Run the following command to download/update all schemas:
+
+```bash
+composer schemas:update
+# or
+php bin/directo-schemas
+```
+
+## Schema Files
+
+- `ws_kliendid.xsd` - Customer endpoint schema
+- `ws_artiklid.xsd` - Item endpoint schema
+
+## Notes
+
+- Schemas are downloaded from Directo's public URLs
+- Keep schemas updated if API changes
+- Schema validation is optional (disabled by default for performance)

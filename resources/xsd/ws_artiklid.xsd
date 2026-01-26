@@ -1,0 +1,109 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	    xmlns:sql="urn:schemas-microsoft-com:mapping-schema">
+
+	<xsd:element name="items"  sql:is-constant="true">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="item" sql:relation="shop_xd1_artiklid" maxOccurs="unbounded"  minOccurs="0" >
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="datafields"  sql:is-constant="true">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element ref="data" sql:relationship="Data" maxOccurs="unbounded"  minOccurs="0" />
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+							<xsd:element name="supplieritems"  sql:is-constant="true">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element ref="supplieritem" sql:relationship="Supplieritem" maxOccurs="unbounded"  minOccurs="0" />
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+						<xsd:attribute name="code"  sql:field="kood" type="xsd:string"/><!-- length: 32; UI|Kood| -->
+						<xsd:attribute name="name"  sql:field="nimi" type="xsd:string"/><!-- length: 255; UI|Nimi| -->
+						<xsd:attribute name="description"  sql:field="pikktekst" type="xsd:string" /><!-- 2048; UI|Kirjeldus| -->
+						<xsd:attribute name="class"  sql:field="klass" type="xsd:string" /><!-- 32; UI|Klass| -->
+						<xsd:attribute name="class_name"  sql:field="klass_nimi" type="xsd:string" /><!-- 32; UI|| -->
+						<xsd:attribute name="sntracking"  sql:field="SN_jalgimine" type="xsd:int" /><!-- ; UI|Seeria nr| -->	<!-- 0=without sn tracking; 1=serial no tracking; 2=batch no tracking  -->
+						<xsd:attribute name="barcode"  sql:field="ribakood" type="xsd:string" /><!-- 32; UI|Ribakood| -->
+						<xsd:attribute name="unit"  sql:field="yhik" type="xsd:string" /><!-- 32; UI|Ühik| -->
+						<xsd:attribute name="salesprice"  sql:field="baashind" type="xsd:decimal" /><!-- 32; UI|Müügihind| --> <!-- without VAT -->
+						<xsd:attribute name="accountlocal"  sql:field="konto_myyk" type="xsd:string" /><!-- 32; UI|Müük Siseriiklik| -->
+						<xsd:attribute name="vatcode"  sql:field="KMkood" type="xsd:string" /><!-- 32; UI|KM Siseriiklik| -->
+						<xsd:attribute name="weight"  sql:field="kaal" type="xsd:decimal" /><!-- ; UI|Kaal| -->
+						<xsd:attribute name="volume"  sql:field="maht" type="xsd:decimal" /><!-- ; UI|Maht| -->
+						<xsd:attribute name="package1"  sql:field="yhikumuut1" type="xsd:decimal" /><!-- ; UI|Pakis 1| -->
+						<xsd:attribute name="package2"  sql:field="yhikumuut2" type="xsd:decimal" /><!-- ; UI|Pakis 2| -->
+						<xsd:attribute name="vatprice"  sql:field="hind_tavaline" type="xsd:decimal" /><!-- ; UI|Tavahind| -->
+						<xsd:attribute name="specialprice1"  sql:field="kaibeta_hind1" type="xsd:decimal" /><!-- ; UI|Artikli käibeta lisahind1 - (customizable)| -->
+						<xsd:attribute name="specialprice2"  sql:field="kaibeta_hind2" type="xsd:decimal" /><!-- ; UI|Artikli käibeta lisahind2 - (customizable)| -->
+						<xsd:attribute name="specialprice3"  sql:field="kaibeta_hind3" type="xsd:decimal" /><!-- ; UI|Artikli käibeta lisahind3 - (customizable)| -->
+						<xsd:attribute name="specialprice4"  sql:field="kaibeta_hind4" type="xsd:decimal" /><!-- ; UI|Artikli käibeta lisahind4 - (customizable)| -->
+						<xsd:attribute name="specialprice5"  sql:field="kaibeta_hind5" type="xsd:decimal" /><!-- ; UI|Artikli käibeta lisahind5 - (customizable)| -->
+						<xsd:attribute name="specialprice6"  sql:field="kaibeta_hind6" type="xsd:decimal" /><!-- ; UI|Artikli käibeta lisahind6 - (customizable)| -->
+						<xsd:attribute name="specialprice7"  sql:field="kaibeta_hind7" type="xsd:decimal" /><!-- ; UI|Artikli käibeta lisahind7 - (customizable)| -->
+						<xsd:attribute name="specialprice8"  sql:field="kaibeta_hind8" type="xsd:decimal" /><!-- ; UI|Artikli käibeta lisahind8 - (customizable)| -->
+						<xsd:attribute name="height"  sql:field="korgus" type="xsd:decimal" /><!-- ; UI|Kõrgus| -->
+						<xsd:attribute name="width"  sql:field="laius" type="xsd:decimal" /><!-- ; UI|Laius| -->
+						<xsd:attribute name="depth"  sql:field="sygavus" type="xsd:decimal" /><!-- ; UI|Sügavus| -->
+						<xsd:attribute name="grossweight"  sql:field="kaal_bruto" type="xsd:decimal" /><!-- ; UI|Bruto kaal| -->
+						<xsd:attribute name="vatprice1"  sql:field="hind_okonline" type="xsd:decimal" /><!-- ; UI|Lisahind 1 (customizable)| --> <!-- with local VAT -->
+						<xsd:attribute name="vatprice2"  sql:field="hind_delfi" type="xsd:decimal" /><!-- ; UI|Lisahind 2 (customizable)| --> <!-- with local VAT -->
+						<xsd:attribute name="vatprice3"  sql:field="soodus_hind1" type="xsd:decimal" /><!-- ; UI|Soodushind 1 (customizable)| --> <!-- with local VAT -->
+						<xsd:attribute name="vatprice4"  sql:field="soodus_hind2" type="xsd:decimal" /><!-- ; UI|Soodushind 2 -customizable)| --> <!-- with local VAT -->
+						<xsd:attribute name="object"  sql:field="objekt" type="xsd:string" /><!-- 255; UI|Objekt| -->
+						<xsd:attribute name="stock"  sql:field="art_ladu" type="xsd:string" /><!-- 32; UI|Ladu| -->
+						<xsd:attribute name="supplier"  sql:field="hankija_kood" type="xsd:string" /><!-- 32; UI|Hankija| -->
+						<xsd:attribute name="url"  sql:field="url" type="xsd:string" /><!-- 255; UI|URL| -->
+						<xsd:attribute name="cost"  sql:field="ostuhind" type="xsd:decimal" /><!-- ; UI|Ostuhind| -->
+						<xsd:attribute name="closed"  sql:field="suletud" type="xsd:int" /><!-- ; UI|Suletud| -->	<!-- closed = 1, open = 0 -->
+						<xsd:attribute name="ts"  sql:field="ts" type="xsd:dateTime" sql:datatype="dateTime"/><!-- UI|Muudetud| -->	<!-- document last changed -->
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:annotation>
+		<xsd:appinfo>
+			<sql:relationship name="Supplieritem"
+                        parent="shop_xd1_artiklid"
+                        parent-key="kood"
+                        child="shop_xd1_artiklid_hankija_artiklid"
+                        child-key="artikkel" />
+		</xsd:appinfo>
+	</xsd:annotation>	
+	<xsd:element name="supplieritem" sql:relation="shop_xd1_artiklid_hankija_artiklid" >
+		<xsd:complexType>
+			<xsd:attribute name="supplier"  sql:field="hankija" type="xsd:string" /><!-- 32; UI|Hankija| -->
+			<xsd:attribute name="supplieritem"  sql:field="hankija_artikkel" type="xsd:string" /><!-- 50; UI|Hank. artikkel| -->
+			<xsd:attribute name="name"  sql:field="nimi" type="xsd:string" /><!-- 255; UI|Nimi| -->
+			<xsd:attribute name="variant"  sql:field="variant" type="xsd:string" /><!-- 32; UI|Variant| -->
+			<xsd:attribute name="varianta"  sql:field="varianta" type="xsd:string" /><!-- 100; UI|VariantA - (customizable)| -->
+			<xsd:attribute name="variantb"  sql:field="variantb" type="xsd:string" /><!-- 100; UI|VariantB - (customizable)| -->
+			<xsd:attribute name="variantc"  sql:field="variantc" type="xsd:string" /><!-- 100; UI|VariantC - (customizable)| -->
+			<xsd:attribute name="sales"  sql:field="myyk" type="xsd:int" /><!-- ; UI|Mittenähtav väli, määrab, et näidatakse Müügiartiklid sakis| -->	<!-- sales item = 1, supplier item = 0 or NULL -->
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:annotation>
+		<xsd:appinfo>
+			<sql:relationship name="Data"
+                        parent="shop_xd1_artiklid"
+                        parent-key="kood"
+                        child="shop_xd1_artiklid_lisa"
+                        child-key="kaart" />
+		</xsd:appinfo>
+	</xsd:annotation>
+	<xsd:element name="data" sql:relation="shop_xd1_artiklid_lisa" >
+		<xsd:complexType>
+			<xsd:attribute name="code"  sql:field="kood" type="xsd:string"/><!-- 32 -->
+			<xsd:attribute name="content"  sql:field="sisu" type="xsd:string"/><!-- 2000; UI|Sisu| -->
+			<xsd:attribute name="param"  sql:field="param" type="xsd:string"/><!-- 64; UI|Parameeter| -->
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>

@@ -1,0 +1,75 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	    xmlns:sql="urn:schemas-microsoft-com:mapping-schema">
+
+	<xsd:element name="customers"  sql:is-constant="true">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="customer" sql:relation="shop_xd1_kliendid" maxOccurs="unbounded"  minOccurs="0" >
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="datafields"  sql:is-constant="true">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element ref="data" sql:relationship="Data" maxOccurs="unbounded"  minOccurs="0" />
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+
+						<xsd:attribute name="code"  sql:field="kood" type="xsd:string"/><!-- length: 32; UI|Kood| -->
+						<xsd:attribute name="name"  sql:field="nimi" type="xsd:string"/><!-- length: 255; UI|Nimi| -->
+						<xsd:attribute name="object"  sql:field="objekt" type="xsd:string"/><!-- 255; UI|Objekt| -->
+						<xsd:attribute name="address1"  sql:field="aadress1" type="xsd:string" /><!-- 255; UI|aadress, ! vastavalt seadetele| -->
+						<xsd:attribute name="address2"  sql:field="aadress2" type="xsd:string" /><!-- 200; UI|aadress, ! vastavalt seadetele| -->
+						<xsd:attribute name="address3"  sql:field="aadress3" type="xsd:string" /><!-- 100; UI|aadress, ! vastavalt seadetele| -->
+						<xsd:attribute name="deliveryaddress1"  sql:field="lahaadress1" type="xsd:string" /><!-- 255; UI|aadress, ! vastavalt seadetele| -->
+						<xsd:attribute name="deliveryaddress2"  sql:field="lahaadress2" type="xsd:string" /><!-- 200; UI|aadress, ! vastavalt seadetele| -->
+						<xsd:attribute name="deliveryaddress3"  sql:field="lahaadress3" type="xsd:string" /><!-- 100; UI|aadress, ! vastavalt seadetele| -->
+						<xsd:attribute name="country"  sql:field="asumaa" type="xsd:string"/><!-- 2; UI|Asumaa| -->
+						<xsd:attribute name="county"  sql:field="maakond" type="xsd:string" /><!-- 32; UI|Maakond| -->
+						<xsd:attribute name="contact"  sql:field="kontakt" type="xsd:string"/><!-- 200; UI|Esindaja| -->
+						<xsd:attribute name="phone"  sql:field="telefon" type="xsd:string"/><!-- 100; UI|Telefon| -->
+						<xsd:attribute name="email"  sql:field="email" type="xsd:string"/><!-- 255; UI|Meil| -->
+						<xsd:attribute name="regno"  sql:field="regnr" type="xsd:string" /><!-- 50; UI|Reg nr| -->
+						<xsd:attribute name="loyaltycard"  sql:field="kliendikaart" type="xsd:string" /><!-- 100; UI|Kliendikaart| -->	<!-- also used for personal ID code -->
+						<xsd:attribute name="vatregno"  sql:field="kmregnr" type="xsd:string" /><!-- 32; UI|Km reg nr| -->
+						<xsd:attribute name="class"  sql:field="klass" type="xsd:string" /><!-- 32; UI|Klass| -->
+						<xsd:attribute name="comment"  sql:field="kommentaar" type="xsd:string" /><!-- 4000 or infinite (slower); UI|Kommentaar| -->
+						<xsd:attribute name="payterm"  sql:field="tingimus" type="xsd:string" /><!-- 32; UI|Tas. ting.| -->
+						<xsd:attribute name="vatregion"  sql:field="maa" type="xsd:int" /><!-- UI|Maa| --><!-- local = 0, EU = 1, export = 2 -->
+						<xsd:attribute name="priceformula"  sql:field="hinnakiri" type="xsd:string" /><!-- 32; UI|Hinnavalem| -->
+						<xsd:attribute name="specialpriceformula"  sql:field="hinnavalem_eri" type="xsd:string" /><!-- 32; UI|Eripakkumised| -->
+						<xsd:attribute name="balance"  sql:field="saldo" type="xsd:decimal" /><!-- UI| | -->
+						<xsd:attribute name="creditlimit"  sql:field="limiit" type="xsd:decimal" /><!-- UI| | -->
+						<xsd:attribute name="creditbalance"  sql:field="krediidijaak" type="xsd:decimal" /><!-- UI| | -->
+						<xsd:attribute name="deliveryinvoice"  sql:field="lah_arve" type="xsd:int" /><!-- 1; UI|Lähetus| --><!-- Lähetus ja Arve = 1, Lähetus = 0 -->
+						<xsd:attribute name="salesman"  sql:field="myyja" type="xsd:string" /><!-- 32; UI|Müüja| -->
+						<xsd:attribute name="currency"  sql:field="valuuta" type="xsd:string" /><!-- 32; UI|Valuuta| -->
+						<xsd:attribute name="discount"  sql:field="ale" type="xsd:decimal" /><!-- UI|Soodus %| -->
+						<xsd:attribute name="closed"  sql:field="suletud" type="xsd:int" /><!-- 9; UI|Suletud| -->	<!-- closed document = 1 -->
+						<xsd:attribute name="ts"  sql:field="ts" type="xsd:dateTime" sql:datatype="dateTime"/><!-- UI| | -->	<!-- document last changed -->
+
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:annotation>
+		<xsd:appinfo>
+			<sql:relationship name="Data"
+						  parent="shop_xd1_kliendid"
+						  parent-key="kood"
+						  child="shop_xd1_kliendid_lisa"
+						  child-key="kaart" />
+		</xsd:appinfo>
+	</xsd:annotation>
+	<xsd:element name="data" sql:relation="shop_xd1_kliendid_lisa" >
+		<xsd:complexType>
+			<xsd:attribute name="code"  sql:field="kood" type="xsd:string"/><!-- 32 -->
+			<xsd:attribute name="content"  sql:field="sisu" type="xsd:string"/><!-- 2000; UI|Sisu| -->
+			<xsd:attribute name="param"  sql:field="param" type="xsd:string"/><!-- 64; UI|Parameeter| -->
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>
