@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transport>
+    <receipt number="123456" confirmed="1" ts="2024-01-15T10:30:00">
+        <rows>
+            <row invoice="INV001" order="1001" aeg="2024-01-15T10:30:00" customer="CUST001" customername="Test Customer" received="150.00" regno="12345678" invoicesum="150.00" />
+            <row invoice="INV002" order="1002" aeg="2024-01-15T11:00:00" customer="CUST002" customername="Another Customer" received="200.00" regno="87654321" invoicesum="200.00" />
+        </rows>
+    </receipt>
+    <receipt number="123457" confirmed="0" ts="2024-01-16T09:00:00">
+        <rows>
+            <row invoice="INV003" customer="CUST003" customername="Third Customer" received="75.50" invoicesum="75.50" />
+        </rows>
+    </receipt>
+</transport>

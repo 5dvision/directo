@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transport>
+    <customer code="C001" name="Single Customer">
+        <datafields/>
+    </customer>
+</transport>

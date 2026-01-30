@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transport>
+    <item code="ITEM001" name="Test Item">
+        <datafields/>
+        <supplieritems/>
+    </item>
+</transport>

@@ -43,6 +43,7 @@ MIT License. See [LICENSE](LICENSE) for details.
 | **Endpoints** | |
 | [Customers](docs/endpoints/customers.md) | Customer records API (list, put, putBatch) |
 | [Items](docs/endpoints/items.md) | Item/product records API (list, put, putBatch) |
+| [Receipts](docs/endpoints/receipts.md) | Payment receipt records API (list) |
 | **Guides** | |
 | [Schema Validation](docs/schema-validation.md) | XSD validation configuration |
 | [Error Handling](docs/error-handling.md) | Exception types and handling |

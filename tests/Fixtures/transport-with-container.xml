@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transport>
+    <customers>
+        <customer code="C001" name="Customer 1"/>
+        <customer code="C002" name="Customer 2"/>
+    </customers>
+</transport>

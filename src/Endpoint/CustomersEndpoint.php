@@ -66,9 +66,9 @@ final class CustomersEndpoint extends AbstractEndpoint
     public function xmlElements(): array
     {
         return [
-            'root' => 'kliendid',
-            'record' => 'klient',
-            'key' => 'kood',
+            'root' => 'customers',
+            'record' => 'customer',
+            'key' => 'code',
         ];
     }
 

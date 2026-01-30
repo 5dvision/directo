@@ -1,0 +1,67 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:sql="urn:schemas-microsoft-com:mapping-schema">
+
+	<xsd:element name="receipts" sql:is-constant="true">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="receipt" sql:relation="in_xd1_mr_laekumised" maxOccurs="unbounded"  minOccurs="0" >
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="rows"  sql:is-constant="true">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element ref="row" sql:relationship="Row" maxOccurs="unbounded"  minOccurs="0" />
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+						<xsd:attribute name="session_id"  sql:field="x" type="xsd:string" />	<!-- for internal use at Directo side, do not send this field! -->
+						<xsd:attribute name="number"  sql:field="number" type="xsd:int" /><!-- length: 9; UI|Laekumine| --><!-- document number/ID, mandatory; It must be unique for each document and remain same if more than one transaction of the same document is necessary -->
+						<xsd:attribute name="date"  sql:field="aeg" type="xsd:dateTime" sql:datatype="dateTime"/><!-- UI|Aeg| -->	<!-- ALT.FROM: current time	-->
+						<xsd:attribute name="description"  sql:field="seletus" type="xsd:string" /><!-- 255; UI|Kommentaar| -->
+						<xsd:attribute name="paymentmode"  sql:field="tasumisviis" type="xsd:string" /><!-- 255; UI|Tas. viis| -->
+						<xsd:attribute name="user"  sql:field="kasutaja" type="xsd:string" /><!-- 32; UI|Kasutaja| -->
+						<xsd:attribute name="reference"  sql:field="viide" type="xsd:string" /><!-- 32; UI|Viide| -->
+						<xsd:attribute name="object"  sql:field="objekt" type="xsd:string" /><!-- 255; UI|Objekt| -->	<!-- ALT.FROM: tr.params -->
+						<xsd:attribute name="project"  sql:field="projekt" type="xsd:string" /><!-- 32; UI|Projekt| -->	<!-- ALT.FROM: tr.params -->
+						<xsd:attribute name="location"  sql:field="arvuti" type="xsd:string" /><!-- 32; UI|Koht| -->
+						<xsd:attribute name="confirm"  sql:field="kinnita" type="xsd:int" /><!-- 1 --><!-- confirm document = 1 -->
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:annotation>
+		<xsd:appinfo>
+			<sql:relationship name="Row"
+                        parent="in_xd1_mr_laekumised"
+                        parent-key="number ext_unique_id x"
+                        child="in_xd1_mr_laekumised_read"
+                        child-key="number ext_unique_id x" />
+		</xsd:appinfo>
+	</xsd:annotation>
+	<xsd:element name="row" sql:relation="in_xd1_mr_laekumised_read" >
+		<xsd:complexType>
+			<xsd:attribute name="invoice"  sql:field="arvenumber" type="xsd:int" /><!-- UI|Arve nr| -->
+			<xsd:attribute name="aeg"  sql:field="raeg" type="xsd:dateTime" sql:datatype="dateTime"/><!-- UI|Aeg| -->	<!-- ALT.FROM: receipt header -->
+			<xsd:attribute name="customer"  sql:field="klient_kood" type="xsd:string" /><!-- 32; UI|Klient| -->	<!-- ALT.FROM: invoice > order > customer by regno field -->
+			<xsd:attribute name="order"  sql:field="ettemaks" type="xsd:int" /><!-- UI|Tellimuse nr| -->
+			<xsd:attribute name="customername"  sql:field="klient_nimi" type="xsd:string" /><!-- 200; UI|Tekst| -->	<!-- ALT.FROM: invoice > order > customer by regno field -->
+			<xsd:attribute name="payment"  sql:field="tasuti" type="xsd:decimal" /><!-- UI|Tasuti| -->	<!-- ALT.FROM: in case of base currency = received field -->
+			<xsd:attribute name="bankcurrency"  sql:field="valuuta_p" type="xsd:string" /><!-- 32; UI|Val saadud| -->	<!-- ALT.FROM: glob.settings > 'EUR' -->
+			<xsd:attribute name="received"  sql:field="summa_p" type="xsd:decimal" /><!-- UI|Summa S| -->
+			<xsd:attribute name="currencyrate"  sql:field="kurss_p" type="xsd:decimal" /><!-- UI|Kurss S| -->	<!-- ALT.FROM: ECB current published rates -->
+			<xsd:attribute name="paymentfee"  sql:field="teenustasu" type="xsd:decimal" /><!-- UI|T-Tasu| -->
+			<xsd:attribute name="vatcode"  sql:field="kmk" type="xsd:int" /><!-- UI|KMk| -->	<!-- ALT.FROM: tr.params -->
+			<xsd:attribute name="paymentfeecurrency"  sql:field="valuuta_teenus" type="xsd:string" /><!-- 32; UI|T-Tasu val.| -->
+			<xsd:attribute name="description"  sql:field="selgitus" type="xsd:string" /><!-- 255; UI|Selgitus| -->
+			<xsd:attribute name="regno"  sql:field="reg" type="xsd:string" /><!-- 32; UI|Reg number/IK| -->	<!-- ALT.FROM: customer -->
+			<xsd:attribute name="bankaccount"  sql:field="arveldusarve" type="xsd:string" /><!-- 100; UI|Arveldusarve| -->
+			<xsd:attribute name="objects"  sql:field="objektid" type="xsd:string" /><!-- 255; UI|Objekt| -->	<!-- ALT.FROM: invoice > order -->
+			<xsd:attribute name="account"  sql:field="r_konto" type="xsd:string" /><!-- 32; UI|Konto| -->
+			<xsd:attribute name="fine"  sql:field="viivis" type="xsd:decimal" /><!-- UI|Viivis| -->
+			<xsd:attribute name="rn"  sql:field="rn" type="xsd:int" /><!-- UI|Nr| --><!--row order number in document 1 - N -->	<!-- ALT.FROM: random -->
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>

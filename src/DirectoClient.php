@@ -7,6 +7,7 @@ namespace Directo;
 use Directo\Endpoint\CustomersEndpoint;
 use Directo\Endpoint\EndpointInterface;
 use Directo\Endpoint\ItemsEndpoint;
+use Directo\Endpoint\ReceiptsEndpoint;
 use Directo\Parser\ErrorResponseDetector;
 use Directo\Parser\XmlRequestBuilder;
 use Directo\Parser\XmlResponseParser;
@@ -85,6 +86,9 @@ final class DirectoClient
     /** @var ItemsEndpoint|null Cached items endpoint */
     private ?ItemsEndpoint $itemsEndpoint = null;
 
+    /** @var ReceiptsEndpoint|null Cached receipts endpoint */
+    private ?ReceiptsEndpoint $receiptsEndpoint = null;
+
     /**
      * Create a new Directo client.
      *
@@ -127,6 +131,16 @@ final class DirectoClient
     public function items(): ItemsEndpoint
     {
         return $this->itemsEndpoint ??= $this->createEndpoint(ItemsEndpoint::class);
+    }
+
+    /**
+     * Access the Receipts endpoint.
+     *
+     * @return ReceiptsEndpoint Receipts endpoint instance
+     */
+    public function receipts(): ReceiptsEndpoint
+    {
+        return $this->receiptsEndpoint ??= $this->createEndpoint(ReceiptsEndpoint::class);
     }
 
     /**

@@ -68,9 +68,9 @@ final class ItemsEndpoint extends AbstractEndpoint
     public function xmlElements(): array
     {
         return [
-            'root' => 'artiklid',
-            'record' => 'artikkel',
-            'key' => 'kood',
+            'root' => 'items',
+            'record' => 'item',
+            'key' => 'code',
         ];
     }
 

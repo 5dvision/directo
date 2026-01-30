@@ -55,7 +55,7 @@ describe('DirectoClient', function () {
         $customers = $client->customers()->list();
 
         expect($customers)->toHaveCount(2);
-        expect($customers[0]['kood'])->toBe('CUST001');
+        expect($customers[0]['@code'])->toBe('CUST001');
     });
 
     test('fetches items with filters', function () {
@@ -70,6 +70,6 @@ describe('DirectoClient', function () {
         $items = $client->items()->list(['class' => 'ELECTRONICS']);
 
         expect($items)->toHaveCount(2);
-        expect($items[0]['nimetus'])->toBe('Test Product');
+        expect($items[0]['@name'])->toBe('Simple Service Item');
     });
 });

@@ -1,31 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<results>
-    <customer>
-        <kood>CUST001</kood>
-        <nimi>Test Customer OÜ</nimi>
-        <email>test@example.com</email>
-        <telefon>+372 5551234</telefon>
-        <registrikood>12345678</registrikood>
-        <aadress>Test Street 123</aadress>
-        <linn>Tallinn</linn>
-        <postiindex>10115</postiindex>
-        <riik>EE</riik>
-        <kliendiryhm>RETAIL</kliendiryhm>
-        <hinnaklass>A</hinnaklass>
-        <suletud>0</suletud>
-    </customer>
-    <customer>
-        <kood>CUST002</kood>
-        <nimi>Another Company AS</nimi>
-        <email>info@another.ee</email>
-        <telefon>+372 5559999</telefon>
-        <registrikood>87654321</registrikood>
-        <aadress>Business Avenue 456</aadress>
-        <linn>Tartu</linn>
-        <postiindex>51003</postiindex>
-        <riik>EE</riik>
-        <kliendiryhm>WHOLESALE</kliendiryhm>
-        <hinnaklass>B</hinnaklass>
-        <suletud>0</suletud>
-    </customer>
-</results>
+<transport>
+    <customers>
+        <customer code="CUST001" name="Test Customer OÜ" address1="Test Street 123" address2="Tallinn" country="EE" email="test@example.com" phone="+372 5551234" regno="12345678" balance="0" creditlimit="0" ts="2024-01-15T10:30:00">
+            <datafields/>
+        </customer>
+        <customer code="CUST002" name="Another Company AS" address1="Business Avenue 456" address2="Tartu" country="EE" email="info@another.ee" phone="+372 5559999" regno="87654321" balance="0" creditlimit="0" ts="2024-01-15T11:00:00">
+            <datafields/>
+        </customer>
+    </customers>
+</transport>

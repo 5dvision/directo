@@ -1,0 +1,49 @@
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:sql="urn:schemas-microsoft-com:mapping-schema">
+
+	<xsd:element name="receipts" sql:is-constant="true">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="receipt" sql:relation="shop_xd1_mr_laekumised" maxOccurs="unbounded"  minOccurs="0" >
+					<xsd:complexType>
+						<xsd:sequence>
+							<xsd:element name="rows"  sql:is-constant="true">
+								<xsd:complexType>
+									<xsd:sequence>
+										<xsd:element ref="row" sql:relationship="Row" maxOccurs="unbounded"  minOccurs="0" />
+									</xsd:sequence>
+								</xsd:complexType>
+							</xsd:element>
+						</xsd:sequence>
+						<xsd:attribute name="number"  sql:field="number" type="xsd:int" /><!-- length: 9; UI|Number| -->
+						<xsd:attribute name="confirmed"  sql:field="kinnitatud" type="xsd:int" /><!-- 1 --><!-- confirmed document = 1 -->
+						<xsd:attribute name="ts"  sql:field="ts" type="xsd:dateTime" sql:datatype="dateTime"/><!-- UI| | -->	<!-- document last changed -->
+
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:annotation>
+		<xsd:appinfo>
+			<sql:relationship name="Row"
+                        parent="shop_xd1_mr_laekumised"
+                        parent-key="number"
+                        child="shop_xd1_mr_laekumised_read"
+                        child-key="number" />
+		</xsd:appinfo>
+	</xsd:annotation>
+	<xsd:element name="row" sql:relation="shop_xd1_mr_laekumised_read" >
+		<xsd:complexType>
+			<xsd:attribute name="invoice"  sql:field="arvenumber" type="xsd:int" /><!-- UI|Arve nr| -->
+			<xsd:attribute name="order"  sql:field="ettemaks" type="xsd:int" /><!-- UI|Tellimuse nr| -->
+			<xsd:attribute name="aeg"  sql:field="raeg" type="xsd:dateTime" sql:datatype="dateTime"/><!-- UI|Aeg| -->
+			<xsd:attribute name="customer"  sql:field="klient_kood" type="xsd:string" /><!-- 32; UI|Klient| -->
+			<xsd:attribute name="customername"  sql:field="klient_nimi" type="xsd:string" /><!-- 200; UI|Tekst| -->
+			<xsd:attribute name="received"  sql:field="summa_p" type="xsd:decimal" /><!-- UI|Summa S| -->
+			<xsd:attribute name="regno"  sql:field="reg" type="xsd:string" /><!-- 32; UI|Reg number/IK| -->
+			<xsd:attribute name="invoicesum"  sql:field="summa_a" type="xsd:decimal" /><!-- UI|Arve saldo| -->
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>
