@@ -125,7 +125,7 @@ final class ArrayToXmlBuilder
 
         if (! $dom->schemaValidate($xsdPath)) {
             $errors = libxml_get_errors();
-            $errorMessages = array_map(fn(\LibXMLError $error): string => sprintf('Line %d: %s', $error->line, trim($error->message)), $errors);
+            $errorMessages = array_map(fn (\LibXMLError $error): string => sprintf('Line %d: %s', $error->line, trim($error->message)), $errors);
 
             libxml_clear_errors();
 

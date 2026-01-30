@@ -198,7 +198,7 @@ abstract class AbstractEndpoint implements Endpoint
      *
      * @param  string  $xmlData  The XML body
      * @param  array<string, mixed>  $extraContext  Additional context for errors
-	 * 
+     *
      * @return array<int, array<string, mixed>> Parsed response
      */
     protected function sendPutRequest(string $xmlData, array $extraContext = []): array

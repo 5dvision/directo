@@ -36,14 +36,7 @@ $customers = $client->customers()->list();
 // List items with filters
 $items = $client->items()->list([
     'class' => 'ELECTRONICS',
-    'closed' => 0,
-]);
-
-// Create/update a record
-$result = $client->items()->put([
-    'kood' => 'ITEM001',
-    'nimetus' => 'New Product',
-    'hind' => 99.99,
+    'ts' => '12.01.2026',
 ]);
 ```
 

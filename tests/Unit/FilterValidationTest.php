@@ -12,8 +12,6 @@ use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 
-
-
 describe('Filter Validation', function (): void {
     test('CustomersEndpoint allows valid filters', function (): void {
         $mock = new MockHandler([
