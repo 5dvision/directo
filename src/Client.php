@@ -5,17 +5,15 @@ declare(strict_types=1);
 namespace Directo;
 
 use Directo\Endpoint\CustomersEndpoint;
-use Directo\Endpoint\EndpointInterface;
+use Directo\Contract\Endpoint;
 use Directo\Endpoint\ItemsEndpoint;
 use Directo\Endpoint\ReceiptsEndpoint;
-use Directo\Parser\ErrorResponseDetector;
-use Directo\Parser\XmlRequestBuilder;
-use Directo\Parser\XmlResponseParser;
+use Directo\Http\ErrorResponseDetector;
+use Directo\Http\RequestBuilder;
+use Directo\Http\ResponseParser;
+use Directo\Http\Transporter;
+use Directo\Contract\Transporter as TransporterContract;
 use Directo\Schema\SchemaRegistry;
-use Directo\Transport\Transport;
-use Directo\Transport\TransportInterface;
-use GuzzleHttp\ClientInterface;
-use Psr\Log\LoggerInterface;
 
 /**
  * Directo XMLCore API client.
@@ -24,7 +22,7 @@ use Psr\Log\LoggerInterface;
  *
  * @example Basic usage
  * ```php
- * $client = new DirectoClient(new Config(
+ * $client = new Client(new Config(
  *     token: 'your-api-token',
  * ));
  *
@@ -42,14 +40,14 @@ use Psr\Log\LoggerInterface;
  * ```
  * @example With schema validation (for debugging)
  * ```php
- * $client = new DirectoClient(new Config(
+ * $client = new Client(new Config(
  *     token: 'your-api-token',
  *     validateSchema: true, // Enable XSD validation
  * ));
  * ```
  * @example With PSR-3 logger
  * ```php
- * $client = new DirectoClient(
+ * $client = new Client(
  *     new Config(token: 'your-api-token'),
  *     logger: $monolog, // Any PSR-3 logger
  * );
@@ -63,22 +61,22 @@ use Psr\Log\LoggerInterface;
  * - Logger can be injected for debugging
  * - Simple factory pattern: no DI container needed
  */
-final class DirectoClient
+final class Client
 {
-    /** @var TransportInterface HTTP transport layer */
-    private TransportInterface $transport;
+    /** @var TransporterContract HTTP transport layer */
+    private readonly TransporterContract $transport;
 
     /** @var SchemaRegistry XSD schema validator */
-    private SchemaRegistry $schemaRegistry;
+    private readonly SchemaRegistry $schemaRegistry;
 
-    /** @var XmlResponseParser XML response parser */
-    private XmlResponseParser $parser;
+    /** @var ResponseParser XML response parser */
+    private readonly ResponseParser $parser;
 
     /** @var ErrorResponseDetector API error detector */
-    private ErrorResponseDetector $errorDetector;
+    private readonly ErrorResponseDetector $errorDetector;
 
-    /** @var XmlRequestBuilder XML request builder */
-    private XmlRequestBuilder $xmlBuilder;
+    /** @var RequestBuilder XML request builder */
+    private readonly RequestBuilder $xmlBuilder;
 
     /** @var CustomersEndpoint|null Cached customers endpoint */
     private ?CustomersEndpoint $customersEndpoint = null;
@@ -93,24 +91,22 @@ final class DirectoClient
      * Create a new Directo client.
      *
      * @param  Config  $config  SDK configuration
-     * @param  ClientInterface|null  $httpClient  Optional Guzzle client (for testing)
-     * @param  LoggerInterface|null  $logger  Optional PSR-3 logger (for debugging)
+     * @param  TransporterContract|null  $transport  Optional Transport implementation
      */
     public function __construct(
         private readonly Config $config,
-        ?ClientInterface $httpClient = null,
-        ?LoggerInterface $logger = null,
+        ?TransporterContract $transport = null,
     ) {
-        $this->transport = new Transport($config, $httpClient, $logger);
+        $this->transport = $transport ?? new Transporter($config);
         $this->schemaRegistry = new SchemaRegistry(
             $config->getSchemaBasePath(),
             $config->schemaBaseUrl,
         );
-        $this->parser = new XmlResponseParser(
+        $this->parser = new ResponseParser(
             treatEmptyAsNull: $config->treatEmptyAsNull,
         );
         $this->errorDetector = new ErrorResponseDetector();
-        $this->xmlBuilder = new XmlRequestBuilder();
+        $this->xmlBuilder = new RequestBuilder();
     }
 
     /**
@@ -146,12 +142,12 @@ final class DirectoClient
     /**
      * Create an endpoint instance with all dependencies.
      *
-     * @template T of EndpointInterface
+     * @template T of Endpoint
      *
      * @param  class-string<T>  $class  Endpoint class name
      * @return T Endpoint instance
      */
-    private function createEndpoint(string $class): EndpointInterface
+    private function createEndpoint(string $class): Endpoint
     {
         return new $class(
             $this->config,
@@ -180,9 +176,9 @@ final class DirectoClient
      *
      * Useful for advanced use cases or testing.
      *
-     * @return TransportInterface HTTP transport
+     * @return TransporterContract HTTP transport
      */
-    public function getTransport(): TransportInterface
+    public function getTransport(): TransporterContract
     {
         return $this->transport;
     }

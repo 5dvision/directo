@@ -6,21 +6,21 @@ use Directo\Config;
 use Directo\Exception\SchemaValidationException;
 use Directo\Schema\SchemaRegistry;
 
-describe('SchemaRegistry', function () {
-    test('returns correct schema path', function () {
+describe('SchemaRegistry', function (): void {
+    test('returns correct schema path', function (): void {
         $registry = new SchemaRegistry('/custom/path', Config::DEFAULT_SCHEMA_BASE_URL);
 
         expect($registry->getSchemaPath('ws_kliendid.xsd'))->toBe('/custom/path/ws_kliendid.xsd');
         expect($registry->getSchemaPath('ws_artiklid.xsd'))->toBe('/custom/path/ws_artiklid.xsd');
     });
 
-    test('returns schema base path', function () {
+    test('returns schema base path', function (): void {
         $registry = new SchemaRegistry('/custom/path', Config::DEFAULT_SCHEMA_BASE_URL);
 
         expect($registry->getSchemaBasePath())->toBe('/custom/path');
     });
 
-    test('returns correct schema URL', function () {
+    test('returns correct schema URL', function (): void {
         $registry = new SchemaRegistry('/tmp', Config::DEFAULT_SCHEMA_BASE_URL);
 
         expect($registry->getSchemaUrl('ws_kliendid.xsd'))->toBe(
@@ -28,7 +28,7 @@ describe('SchemaRegistry', function () {
         );
     });
 
-    test('returns custom schema base URL', function () {
+    test('returns custom schema base URL', function (): void {
         $customUrl = 'https://custom.example.com/schemas/';
         $registry = new SchemaRegistry('/tmp', $customUrl);
 
@@ -38,13 +38,13 @@ describe('SchemaRegistry', function () {
         );
     });
 
-    test('schemaFileExists returns false when file missing', function () {
+    test('schemaFileExists returns false when file missing', function (): void {
         $registry = new SchemaRegistry('/nonexistent/path', Config::DEFAULT_SCHEMA_BASE_URL);
 
         expect($registry->schemaFileExists('ws_kliendid.xsd'))->toBeFalse();
     });
 
-    test('schemaFileExists returns true when file exists', function () {
+    test('schemaFileExists returns true when file exists', function (): void {
         $tempDir = sys_get_temp_dir().'/directo-test-'.uniqid();
         mkdir($tempDir);
         file_put_contents($tempDir.'/ws_test.xsd', '<schema/>');
@@ -59,8 +59,8 @@ describe('SchemaRegistry', function () {
     });
 });
 
-describe('Schema Validation', function () {
-    beforeEach(function () {
+describe('Schema Validation', function (): void {
+    beforeEach(function (): void {
         // Create a minimal valid XSD for testing
         $this->tempDir = sys_get_temp_dir().'/directo-test-'.uniqid();
         mkdir($this->tempDir);
@@ -82,15 +82,15 @@ XSD;
         file_put_contents($this->tempDir.'/ws_kliendid.xsd', $minimalXsd);
     });
 
-    afterEach(function () {
+    afterEach(function (): void {
         // Cleanup
-        if (isset($this->tempDir) && is_dir($this->tempDir)) {
-            array_map('unlink', glob($this->tempDir.'/*'));
+        if (property_exists($this, 'tempDir') && $this->tempDir !== null && is_dir($this->tempDir)) {
+            array_map(unlink(...), glob($this->tempDir.'/*'));
             rmdir($this->tempDir);
         }
     });
 
-    test('validates XML against schema successfully', function () {
+    test('validates XML against schema successfully', function (): void {
         $registry = new SchemaRegistry($this->tempDir, Config::DEFAULT_SCHEMA_BASE_URL);
 
         $xml = '<?xml version="1.0"?><results><customer><kood>TEST</kood></customer></results>';
@@ -101,7 +101,7 @@ XSD;
         expect(true)->toBeTrue(); // If we get here, validation passed
     });
 
-    test('throws SchemaValidationException on invalid XML', function () {
+    test('throws SchemaValidationException on invalid XML', function (): void {
         // Create a strict XSD
         $strictXsd = <<<'XSD'
 <?xml version="1.0" encoding="UTF-8"?>
@@ -131,7 +131,7 @@ XSD;
         $registry->validateFile($invalidXml, 'ws_kliendid.xsd');
     })->throws(SchemaValidationException::class);
 
-    test('SchemaValidationException contains error details', function () {
+    test('SchemaValidationException contains error details', function (): void {
         $strictXsd = <<<'XSD'
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
@@ -150,14 +150,14 @@ XSD;
 
         try {
             $registry->validateFile('<?xml version="1.0"?><results></results>', 'ws_kliendid.xsd');
-        } catch (SchemaValidationException $e) {
-            expect($e->getValidationErrors())->toBeArray();
-            expect($e->getFormattedErrors())->toBeArray();
-            expect($e->getSchemaPath())->toContain('ws_kliendid.xsd');
+        } catch (SchemaValidationException $schemaValidationException) {
+            expect($schemaValidationException->getValidationErrors())->toBeArray();
+            expect($schemaValidationException->getFormattedErrors())->toBeArray();
+            expect($schemaValidationException->getSchemaPath())->toContain('ws_kliendid.xsd');
         }
     });
 
-    test('throws when schema file does not exist', function () {
+    test('throws when schema file does not exist', function (): void {
         $registry = new SchemaRegistry('/nonexistent/path', Config::DEFAULT_SCHEMA_BASE_URL);
 
         $registry->validateFile('<results/>', 'ws_kliendid.xsd');

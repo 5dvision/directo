@@ -29,7 +29,7 @@ use DOMDocument;
  * - No runtime caching needed (DOMDocument loads from file)
  * - Update via CLI command, not automatically (predictable builds)
  */
-final class SchemaRegistry
+final readonly class SchemaRegistry
 {
     /**
      * Create a new schema registry.
@@ -38,8 +38,8 @@ final class SchemaRegistry
      * @param  string  $schemaBaseUrl  Base URL for downloading schemas
      */
     public function __construct(
-        private readonly string $schemaBasePath,
-        private readonly string $schemaBaseUrl,
+        private string $schemaBasePath,
+        private string $schemaBaseUrl,
     ) {
     }
 

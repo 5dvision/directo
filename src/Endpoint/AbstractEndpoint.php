@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Directo\Endpoint;
 
 use Directo\Config;
+use Directo\Contract\Transporter;
+use Directo\Contract\Endpoint;
 use Directo\Exception\InvalidFilterException;
-use Directo\Parser\ErrorResponseDetector;
-use Directo\Parser\XmlRequestBuilder;
-use Directo\Parser\XmlResponseParser;
+use Directo\Http\ErrorResponseDetector;
+use Directo\Http\RequestBuilder;
+use Directo\Http\ResponseParser;
 use Directo\Schema\SchemaRegistry;
-use Directo\Transport\TransportInterface;
 use Stringable;
 
 /**
@@ -34,30 +35,33 @@ use Stringable;
  * - Testable: Transport can be mocked
  * - Schemas defined per endpoint, not in external registry
  */
-abstract class AbstractEndpoint implements EndpointInterface
+abstract class AbstractEndpoint implements Endpoint
 {
     /**
      * Create endpoint with all dependencies.
      *
      * @param  Config  $config  SDK configuration
-     * @param  TransportInterface  $transport  HTTP transport layer
+     * @param  Transporter  $transport  HTTP transport layer
      * @param  SchemaRegistry  $schemaRegistry  Schema validator
-     * @param  XmlResponseParser  $parser  XML response parser
+     * @param  ResponseParser  $parser  XML response parser
      * @param  ErrorResponseDetector  $errorDetector  Error response detector
-     * @param  XmlRequestBuilder  $xmlBuilder  XML request builder
+     * @param  RequestBuilder  $xmlBuilder  XML request builder
      */
     public function __construct(
         protected readonly Config $config,
-        protected readonly TransportInterface $transport,
+        protected readonly Transporter $transport,
         protected readonly SchemaRegistry $schemaRegistry,
-        protected readonly XmlResponseParser $parser,
+        protected readonly ResponseParser $parser,
         protected readonly ErrorResponseDetector $errorDetector,
-        protected readonly XmlRequestBuilder $xmlBuilder,
+        protected readonly RequestBuilder $xmlBuilder,
     ) {
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @param array<string, scalar|Stringable> $filters
+     * @return array<int, array<string, mixed>>
      */
     public function list(array $filters = []): array
     {
@@ -92,7 +96,7 @@ abstract class AbstractEndpoint implements EndpointInterface
         $provided = array_keys($filters);
         $unknown = array_diff($provided, $allowed);
 
-        if (! empty($unknown)) {
+        if ($unknown !== []) {
             throw InvalidFilterException::unknownFilters($unknown, $allowed, $this->what());
         }
 
@@ -151,6 +155,12 @@ abstract class AbstractEndpoint implements EndpointInterface
     /**
      * {@inheritDoc}
      */
+    /**
+     * {@inheritDoc}
+     *
+     * @param array<string, mixed> $data
+     * @return array<string, mixed>
+     */
     public function put(array $data): array
     {
         $elements = $this->xmlElements();
@@ -166,6 +176,9 @@ abstract class AbstractEndpoint implements EndpointInterface
 
     /**
      * {@inheritDoc}
+     *
+     * @param array<int, array<string, mixed>> $records
+     * @return array<string, mixed>
      */
     public function putBatch(array $records): array
     {
@@ -185,7 +198,8 @@ abstract class AbstractEndpoint implements EndpointInterface
      *
      * @param  string  $xmlData  The XML body
      * @param  array<string, mixed>  $extraContext  Additional context for errors
-     * @return array<string, mixed> Parsed response
+	 * 
+     * @return array<int, array<string, mixed>> Parsed response
      */
     protected function sendPutRequest(string $xmlData, array $extraContext = []): array
     {

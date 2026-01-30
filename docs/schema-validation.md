@@ -17,9 +17,9 @@ Enable schema validation via Config:
 
 ```php
 use Directo\Config;
-use Directo\DirectoClient;
+use Directo\Client;
 
-$client = new DirectoClient(new Config(
+$client = new Client(new Config(
     token: 'your-api-token',
     validateSchema: true,  // Enable XSD validation
 ));

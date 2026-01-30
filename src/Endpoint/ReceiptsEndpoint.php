@@ -8,7 +8,7 @@ namespace Directo\Endpoint;
  * Receipts (Laekumised) endpoint.
  *
  * Retrieves receipt/payment records from Directo XMLCore API.
- * 
+ *
  * **Note**: This is a read-only endpoint. Only list() operations are supported.
  *
  * Available filters:
@@ -46,6 +46,8 @@ final class ReceiptsEndpoint extends AbstractEndpoint
 
     /**
      * {@inheritDoc}
+     *
+     * @return list<string>
      */
     public function allowedFilters(): array
     {
@@ -59,6 +61,8 @@ final class ReceiptsEndpoint extends AbstractEndpoint
 
     /**
      * {@inheritDoc}
+     *
+     * @return array{root: string, record: string, key: string}
      */
     public function xmlElements(): array
     {
@@ -71,6 +75,8 @@ final class ReceiptsEndpoint extends AbstractEndpoint
 
     /**
      * {@inheritDoc}
+     *
+     * @return array{list: string, put: ?string}
      */
     public function schemas(): array
     {

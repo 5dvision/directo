@@ -61,14 +61,16 @@ final class OrdersEndpoint extends AbstractEndpoint
 
 ## Step 2: Add Client Method
 
-Add a method to `DirectoClient`:
+Add a method to `Client`:
 
 ```php
-// In DirectoClient.php
+// In Client.php
+
+private ?OrdersEndpoint $ordersEndpoint = null;
 
 public function orders(): OrdersEndpoint
 {
-    return $this->getEndpoint('orders', OrdersEndpoint::class);
+    return $this->ordersEndpoint ??= $this->createEndpoint(OrdersEndpoint::class);
 }
 ```
 
@@ -140,7 +142,7 @@ final class OrdersEndpoint extends AbstractEndpoint
 ### Usage
 
 ```php
-$client = new DirectoClient($config);
+$client = new Client($config);
 
 // List all orders
 $orders = $client->orders()->list();
@@ -253,7 +255,7 @@ test('lists orders', function () {
 - [ ] Implement `xmlElements()` returning root/record/key config
 - [ ] Implement `schemas()` returning schema files per operation
 - [ ] Add custom methods for common queries (optional)
-- [ ] Add client method to `DirectoClient`
+- [ ] Add client method to `Client`
 - [ ] Write unit tests
 - [ ] Add documentation in `docs/endpoints/`
 

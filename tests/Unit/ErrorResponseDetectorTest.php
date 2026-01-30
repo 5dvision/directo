@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 use Directo\Exception\ApiErrorException;
-use Directo\Parser\ErrorResponseDetector;
+use Directo\Http\ErrorResponseDetector;
 
-describe('ErrorResponseDetector', function () {
-    test('does not throw on empty response', function () {
+describe('ErrorResponseDetector', function (): void {
+    test('does not throw on empty response', function (): void {
         $detector = new ErrorResponseDetector();
 
         $detector->detectAndThrow('', []);
@@ -15,7 +15,7 @@ describe('ErrorResponseDetector', function () {
         expect(true)->toBeTrue(); // No exception
     });
 
-    test('does not throw on valid response without errors', function () {
+    test('does not throw on valid response without errors', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = <<<'XML'
@@ -33,7 +33,7 @@ XML;
         expect(true)->toBeTrue();
     });
 
-    test('detects root <error> element', function () {
+    test('detects root <error> element', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = '<error>Invalid API key</error>';
@@ -41,7 +41,7 @@ XML;
         $detector->detectAndThrow($xml, []);
     })->throws(ApiErrorException::class, 'Directo API error: Invalid API key');
 
-    test('detects <error> inside <results>', function () {
+    test('detects <error> inside <results>', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = <<<'XML'
@@ -54,7 +54,7 @@ XML;
         $detector->detectAndThrow($xml, []);
     })->throws(ApiErrorException::class, 'Directo API error: Customer not found');
 
-    test('detects multiple <error> elements', function () {
+    test('detects multiple <error> elements', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = <<<'XML'
@@ -70,15 +70,15 @@ XML;
         try {
             $detector->detectAndThrow($xml, []);
             expect(false)->toBeTrue(); // Should not reach here
-        } catch (ApiErrorException $e) {
-            expect($e->getErrors())->toHaveCount(2);
-            expect($e->getErrors()[0])->toBe('Field "code" is required');
-            expect($e->getErrors()[1])->toBe('Field "name" is required');
-            expect($e->hasMultipleErrors())->toBeTrue();
+        } catch (ApiErrorException $apiErrorException) {
+            expect($apiErrorException->getErrors())->toHaveCount(2);
+            expect($apiErrorException->getErrors()[0])->toBe('Field "code" is required');
+            expect($apiErrorException->getErrors()[1])->toBe('Field "name" is required');
+            expect($apiErrorException->hasMultipleErrors())->toBeTrue();
         }
     });
 
-    test('detects error="1" attribute with message', function () {
+    test('detects error="1" attribute with message', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = '<results error="1" message="Access denied"/>';
@@ -86,7 +86,7 @@ XML;
         $detector->detectAndThrow($xml, []);
     })->throws(ApiErrorException::class, 'Access denied');
 
-    test('detects error attribute as message', function () {
+    test('detects error attribute as message', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = '<results error="Invalid request format"/>';
@@ -94,7 +94,7 @@ XML;
         $detector->detectAndThrow($xml, []);
     })->throws(ApiErrorException::class, 'Invalid request format');
 
-    test('detects error element with desc attribute', function () {
+    test('detects error element with desc attribute', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = <<<'XML'
@@ -107,7 +107,7 @@ XML;
         $detector->detectAndThrow($xml, []);
     })->throws(ApiErrorException::class, 'Invalid item code');
 
-    test('detects error element with message attribute', function () {
+    test('detects error element with message attribute', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = <<<'XML'
@@ -120,7 +120,7 @@ XML;
         $detector->detectAndThrow($xml, []);
     })->throws(ApiErrorException::class, 'Something went wrong');
 
-    test('detects status element with error code', function () {
+    test('detects status element with error code', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = <<<'XML'
@@ -132,7 +132,7 @@ XML;
         $detector->detectAndThrow($xml, []);
     })->throws(ApiErrorException::class, 'Operation failed');
 
-    test('detects Estonian error element (viga)', function () {
+    test('detects Estonian error element (viga)', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = '<viga>Vigane päring</viga>';
@@ -140,7 +140,7 @@ XML;
         $detector->detectAndThrow($xml, []);
     })->throws(ApiErrorException::class, 'Vigane päring');
 
-    test('case insensitive error detection', function () {
+    test('case insensitive error detection', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = '<ERROR>Something went wrong</ERROR>';
@@ -148,7 +148,7 @@ XML;
         $detector->detectAndThrow($xml, []);
     })->throws(ApiErrorException::class, 'Something went wrong');
 
-    test('preserves context in exception', function () {
+    test('preserves context in exception', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = '<error>Test error</error>';
@@ -157,12 +157,12 @@ XML;
         try {
             $detector->detectAndThrow($xml, $context);
             expect(false)->toBeTrue();
-        } catch (ApiErrorException $e) {
-            expect($e->getContext())->toBe($context);
+        } catch (ApiErrorException $apiErrorException) {
+            expect($apiErrorException->getContext())->toBe($context);
         }
     });
 
-    test('provides raw XML in exception', function () {
+    test('provides raw XML in exception', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = '<error>Some error message</error>';
@@ -170,12 +170,12 @@ XML;
         try {
             $detector->detectAndThrow($xml, []);
             expect(false)->toBeTrue();
-        } catch (ApiErrorException $e) {
-            expect($e->getRawXml())->toBe($xml);
+        } catch (ApiErrorException $apiErrorException) {
+            expect($apiErrorException->getRawXml())->toBe($xml);
         }
     });
 
-    test('getFormattedErrors returns numbered list', function () {
+    test('getFormattedErrors returns numbered list', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = <<<'XML'
@@ -187,14 +187,14 @@ XML;
 
         try {
             $detector->detectAndThrow($xml, []);
-        } catch (ApiErrorException $e) {
-            $formatted = $e->getFormattedErrors();
+        } catch (ApiErrorException $apiErrorException) {
+            $formatted = $apiErrorException->getFormattedErrors();
             expect($formatted[0])->toBe('[1] First');
             expect($formatted[1])->toBe('[2] Second');
         }
     });
 
-    test('handles invalid XML gracefully', function () {
+    test('handles invalid XML gracefully', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = '<invalid>not closed';
@@ -205,7 +205,7 @@ XML;
         expect(true)->toBeTrue();
     });
 
-    test('does not false-positive on "error" in content', function () {
+    test('does not false-positive on "error" in content', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = <<<'XML'
@@ -223,7 +223,7 @@ XML;
         expect(true)->toBeTrue();
     });
 
-    test('detects auth error - invalid token (result type=5)', function () {
+    test('detects auth error - invalid token (result type=5)', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = '<result type="5" desc="Unauthorized"/>';
@@ -231,7 +231,7 @@ XML;
         $detector->detectAndThrow($xml, []);
     })->throws(ApiErrorException::class, 'Unauthorized');
 
-    test('detects auth error - token required', function () {
+    test('detects auth error - token required', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = '<err>token required</err>';
@@ -239,7 +239,7 @@ XML;
         $detector->detectAndThrow($xml, []);
     })->throws(ApiErrorException::class, 'token required');
 
-    test('detects result type error with text content', function () {
+    test('detects result type error with text content', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = '<result type="5">Authentication failed</result>';
@@ -247,7 +247,7 @@ XML;
         $detector->detectAndThrow($xml, []);
     })->throws(ApiErrorException::class, 'Authentication failed');
 
-    test('auth error exception contains raw XML', function () {
+    test('auth error exception contains raw XML', function (): void {
         $detector = new ErrorResponseDetector();
 
         $xml = '<result type="5" desc="Unauthorized"/>';
@@ -255,23 +255,23 @@ XML;
         try {
             $detector->detectAndThrow($xml, ['endpoint' => 'customer']);
             expect(false)->toBeTrue();
-        } catch (ApiErrorException $e) {
-            expect($e->getRawXml())->toBe($xml);
-            expect($e->getErrors()[0])->toBe('Unauthorized');
-            expect($e->getContext()['endpoint'])->toBe('customer');
+        } catch (ApiErrorException $apiErrorException) {
+            expect($apiErrorException->getRawXml())->toBe($xml);
+            expect($apiErrorException->getErrors()[0])->toBe('Unauthorized');
+            expect($apiErrorException->getContext()['endpoint'])->toBe('customer');
         }
     });
 });
 
-describe('ApiErrorException', function () {
-    test('can be caught as DirectoException', function () {
+describe('ApiErrorException', function (): void {
+    test('can be caught as DirectoException', function (): void {
         $detector = new ErrorResponseDetector();
 
         try {
             $detector->detectAndThrow('<error>Test</error>', []);
             expect(false)->toBeTrue();
-        } catch (\Directo\Exception\DirectoException $e) {
-            expect($e)->toBeInstanceOf(ApiErrorException::class);
+        } catch (\Directo\Exception\DirectoException $directoException) {
+            expect($directoException)->toBeInstanceOf(ApiErrorException::class);
         }
     });
 });

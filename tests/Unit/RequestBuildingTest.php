@@ -5,32 +5,32 @@ declare(strict_types=1);
 use Directo\Config;
 use Directo\Endpoint\CustomersEndpoint;
 use Directo\Endpoint\ItemsEndpoint;
-use Directo\Parser\ErrorResponseDetector;
-use Directo\Parser\XmlRequestBuilder;
-use Directo\Parser\XmlResponseParser;
+use Directo\Http\ErrorResponseDetector;
+use Directo\Http\RequestBuilder;
+use Directo\Http\ResponseParser;
+use Directo\Http\Transporter;
 use Directo\Schema\SchemaRegistry;
-use Directo\Transport\Transport;
-use GuzzleHttp\Client;
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\Response;
 
-function makeEndpoint(string $class, Config $config, Transport $transport): mixed
+function makeEndpoint(string $class, Config $config, Transporter $transport): mixed
 {
     $schemaRegistry = new SchemaRegistry(
         $config->getSchemaBasePath(),
         $config->schemaBaseUrl,
     );
-    $parser = new XmlResponseParser($config->treatEmptyAsNull);
+    $parser = new ResponseParser($config->treatEmptyAsNull);
     $errorDetector = new ErrorResponseDetector();
-    $xmlBuilder = new XmlRequestBuilder();
+    $xmlBuilder = new RequestBuilder();
 
     return new $class($config, $transport, $schemaRegistry, $parser, $errorDetector, $xmlBuilder);
 }
 
-describe('Request Building', function () {
-    test('includes get=1 and what parameter', function () {
+describe('Request Building', function (): void {
+    test('includes get=1 and what parameter', function (): void {
         $history = [];
         $historyMiddleware = Middleware::history($history);
 
@@ -41,9 +41,9 @@ describe('Request Building', function () {
         $stack = HandlerStack::create($mock);
         $stack->push($historyMiddleware);
 
-        $client = new Client(['handler' => $stack]);
+        $client = new GuzzleClient(['handler' => $stack]);
         $config = new Config(token: 'secret-key');
-        $transport = new Transport($config, $client);
+        $transport = new Transporter($config, $client);
         $endpoint = makeEndpoint(CustomersEndpoint::class, $config, $transport);
 
         $endpoint->list();
@@ -57,7 +57,7 @@ describe('Request Building', function () {
         expect($body)->toContain('what=customer');
     });
 
-    test('includes token parameter with configured name', function () {
+    test('includes token parameter with configured name', function (): void {
         $history = [];
         $historyMiddleware = Middleware::history($history);
 
@@ -68,12 +68,12 @@ describe('Request Building', function () {
         $stack = HandlerStack::create($mock);
         $stack->push($historyMiddleware);
 
-        $client = new Client(['handler' => $stack]);
+        $client = new GuzzleClient(['handler' => $stack]);
         $config = new Config(
             token: 'my-secret-token',
             tokenParamName: 'appkey',
         );
-        $transport = new Transport($config, $client);
+        $transport = new Transporter($config, $client);
         $endpoint = makeEndpoint(CustomersEndpoint::class, $config, $transport);
 
         $endpoint->list();
@@ -82,7 +82,7 @@ describe('Request Building', function () {
         expect($body)->toContain('appkey=my-secret-token');
     });
 
-    test('includes filters in request', function () {
+    test('includes filters in request', function (): void {
         $history = [];
         $historyMiddleware = Middleware::history($history);
 
@@ -93,9 +93,9 @@ describe('Request Building', function () {
         $stack = HandlerStack::create($mock);
         $stack->push($historyMiddleware);
 
-        $client = new Client(['handler' => $stack]);
+        $client = new GuzzleClient(['handler' => $stack]);
         $config = new Config(token: 'test-key');
-        $transport = new Transport($config, $client);
+        $transport = new Transporter($config, $client);
         $endpoint = makeEndpoint(CustomersEndpoint::class, $config, $transport);
 
         $endpoint->list([
@@ -108,7 +108,7 @@ describe('Request Building', function () {
         expect($body)->toContain('closed=0');
     });
 
-    test('sends POST request with correct content type', function () {
+    test('sends POST request with correct content type', function (): void {
         $history = [];
         $historyMiddleware = Middleware::history($history);
 
@@ -119,9 +119,9 @@ describe('Request Building', function () {
         $stack = HandlerStack::create($mock);
         $stack->push($historyMiddleware);
 
-        $client = new Client(['handler' => $stack]);
+        $client = new GuzzleClient(['handler' => $stack]);
         $config = new Config(token: 'test-key');
-        $transport = new Transport($config, $client);
+        $transport = new Transporter($config, $client);
         $endpoint = makeEndpoint(ItemsEndpoint::class, $config, $transport);
 
         $endpoint->list();
@@ -131,7 +131,7 @@ describe('Request Building', function () {
         expect($request->getHeaderLine('Content-Type'))->toBe('application/x-www-form-urlencoded');
     });
 
-    test('sends to correct URL', function () {
+    test('sends to correct URL', function (): void {
         $history = [];
         $historyMiddleware = Middleware::history($history);
 
@@ -142,9 +142,9 @@ describe('Request Building', function () {
         $stack = HandlerStack::create($mock);
         $stack->push($historyMiddleware);
 
-        $client = new Client(['handler' => $stack]);
+        $client = new GuzzleClient(['handler' => $stack]);
         $config = new Config(token: 'test-key');
-        $transport = new Transport($config, $client);
+        $transport = new Transporter($config, $client);
         $endpoint = makeEndpoint(CustomersEndpoint::class, $config, $transport);
 
         $endpoint->list();
@@ -153,7 +153,7 @@ describe('Request Building', function () {
         expect((string) $request->getUri())->toBe('https://login.directo.ee/xmlcore/cap_xml_direct/xmlcore.asp');
     });
 
-    test('ItemsEndpoint uses what=item', function () {
+    test('ItemsEndpoint uses what=item', function (): void {
         $history = [];
         $historyMiddleware = Middleware::history($history);
 
@@ -164,9 +164,9 @@ describe('Request Building', function () {
         $stack = HandlerStack::create($mock);
         $stack->push($historyMiddleware);
 
-        $client = new Client(['handler' => $stack]);
+        $client = new GuzzleClient(['handler' => $stack]);
         $config = new Config(token: 'test-key');
-        $transport = new Transport($config, $client);
+        $transport = new Transporter($config, $client);
         $endpoint = makeEndpoint(ItemsEndpoint::class, $config, $transport);
 
         $endpoint->list(['class' => 'ELECTRONICS']);

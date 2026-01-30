@@ -6,38 +6,23 @@ use Directo\Config;
 use Directo\Endpoint\CustomersEndpoint;
 use Directo\Endpoint\ItemsEndpoint;
 use Directo\Exception\InvalidFilterException;
-use Directo\Parser\ErrorResponseDetector;
-use Directo\Parser\XmlRequestBuilder;
-use Directo\Parser\XmlResponseParser;
-use Directo\Schema\SchemaRegistry;
-use Directo\Transport\Transport;
-use GuzzleHttp\Client;
+use Directo\Http\Transporter;
+use GuzzleHttp\Client as GuzzleClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 
-function createEndpoint(string $class, Config $config, Transport $transport): mixed
-{
-    $schemaRegistry = new SchemaRegistry(
-        $config->getSchemaBasePath(),
-        $config->schemaBaseUrl,
-    );
-    $parser = new XmlResponseParser($config->treatEmptyAsNull);
-    $errorDetector = new ErrorResponseDetector();
-    $xmlBuilder = new XmlRequestBuilder();
 
-    return new $class($config, $transport, $schemaRegistry, $parser, $errorDetector, $xmlBuilder);
-}
 
-describe('Filter Validation', function () {
-    test('CustomersEndpoint allows valid filters', function () {
+describe('Filter Validation', function (): void {
+    test('CustomersEndpoint allows valid filters', function (): void {
         $mock = new MockHandler([
             new Response(200, [], fixture('customers.xml')),
         ]);
 
-        $client = new Client(['handler' => HandlerStack::create($mock)]);
+        $client = new GuzzleClient(['handler' => HandlerStack::create($mock)]);
         $config = new Config(token: 'test-key');
-        $transport = new Transport($config, $client);
+        $transport = new Transporter($config, $client);
         $endpoint = createEndpoint(CustomersEndpoint::class, $config, $transport);
 
         // Should not throw
@@ -49,22 +34,22 @@ describe('Filter Validation', function () {
         expect($result)->toBeArray();
     });
 
-    test('CustomersEndpoint rejects unknown filters', function () {
+    test('CustomersEndpoint rejects unknown filters', function (): void {
         $config = new Config(token: 'test-key');
-        $transport = new Transport($config);
+        $transport = new Transporter($config);
         $endpoint = createEndpoint(CustomersEndpoint::class, $config, $transport);
 
         $endpoint->list(['unknown_filter' => 'value']);
     })->throws(InvalidFilterException::class, 'Unknown filter(s) [unknown_filter]');
 
-    test('ItemsEndpoint allows valid filters', function () {
+    test('ItemsEndpoint allows valid filters', function (): void {
         $mock = new MockHandler([
             new Response(200, [], fixture('items.xml')),
         ]);
 
-        $client = new Client(['handler' => HandlerStack::create($mock)]);
+        $client = new GuzzleClient(['handler' => HandlerStack::create($mock)]);
         $config = new Config(token: 'test-key');
-        $transport = new Transport($config, $client);
+        $transport = new Transporter($config, $client);
         $endpoint = createEndpoint(ItemsEndpoint::class, $config, $transport);
 
         $result = $endpoint->list([
@@ -75,30 +60,30 @@ describe('Filter Validation', function () {
         expect($result)->toBeArray();
     });
 
-    test('ItemsEndpoint rejects unknown filters', function () {
+    test('ItemsEndpoint rejects unknown filters', function (): void {
         $config = new Config(token: 'test-key');
-        $transport = new Transport($config);
+        $transport = new Transporter($config);
         $endpoint = createEndpoint(ItemsEndpoint::class, $config, $transport);
 
         $endpoint->list(['invalid' => 'filter', 'also_invalid' => 'value']);
     })->throws(InvalidFilterException::class, 'Unknown filter(s) [invalid, also_invalid]');
 
-    test('rejects non-scalar filter values', function () {
+    test('rejects non-scalar filter values', function (): void {
         $config = new Config(token: 'test-key');
-        $transport = new Transport($config);
+        $transport = new Transporter($config);
         $endpoint = createEndpoint(CustomersEndpoint::class, $config, $transport);
 
         $endpoint->list(['code' => ['array', 'value']]);
     })->throws(InvalidFilterException::class, 'must be scalar or Stringable');
 
-    test('accepts Stringable filter values', function () {
+    test('accepts Stringable filter values', function (): void {
         $mock = new MockHandler([
             new Response(200, [], fixture('customers.xml')),
         ]);
 
-        $client = new Client(['handler' => HandlerStack::create($mock)]);
+        $client = new GuzzleClient(['handler' => HandlerStack::create($mock)]);
         $config = new Config(token: 'test-key');
-        $transport = new Transport($config, $client);
+        $transport = new Transporter($config, $client);
         $endpoint = createEndpoint(CustomersEndpoint::class, $config, $transport);
 
         $stringable = new class () implements Stringable {
@@ -113,17 +98,17 @@ describe('Filter Validation', function () {
         expect($result)->toBeArray();
     });
 
-    test('exception contains context', function () {
+    test('exception contains context', function (): void {
         $config = new Config(token: 'test-key');
-        $transport = new Transport($config);
+        $transport = new Transporter($config);
         $endpoint = createEndpoint(CustomersEndpoint::class, $config, $transport);
 
         try {
             $endpoint->list(['bad_filter' => 'value']);
-        } catch (InvalidFilterException $e) {
-            expect($e->getContext())->toHaveKey('endpoint');
-            expect($e->getContext()['unknown_filters'])->toContain('bad_filter');
-            expect($e->getContext()['allowed_filters'])->toContain('code');
+        } catch (InvalidFilterException $invalidFilterException) {
+            expect($invalidFilterException->getContext())->toHaveKey('endpoint');
+            expect($invalidFilterException->getContext()['unknown_filters'])->toContain('bad_filter');
+            expect($invalidFilterException->getContext()['allowed_filters'])->toContain('code');
         }
     });
 });

@@ -158,7 +158,7 @@ use Monolog\Handler\StreamHandler;
 $logger = new Logger('directo');
 $logger->pushHandler(new StreamHandler('directo.log', Logger::DEBUG));
 
-$client = new DirectoClient($token, $logger);
+$client = new Client($token, $logger);
 ```
 
 ## Best Practices
@@ -174,7 +174,7 @@ try {
     $result = $client->items()->put($data);
 } catch (AuthenticationException $e) {
     // Token expired - refresh and retry
-    $client = new DirectoClient($newToken);
+    $client = new Client($newToken);
     $result = $client->items()->put($data);
 } catch (TransportException $e) {
     // Network error - retry with backoff

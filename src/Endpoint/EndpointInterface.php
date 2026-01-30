@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Directo\Endpoint;
 
+use Directo\Contract\Endpoint;
+
 /**
  * Interface for all Directo XMLCore endpoints.
  *
@@ -18,7 +20,7 @@ namespace Directo\Endpoint;
  * - Schemas defined per operation (list, put) for clarity
  * - Adding new endpoint = implement interface, no registry updates
  */
-interface EndpointInterface
+interface EndpointInterface extends Endpoint
 {
     /**
      * Get the 'what' parameter value for this endpoint.

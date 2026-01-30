@@ -2,69 +2,31 @@
 
 Production-ready PHP 8.2+ SDK for the Directo XMLCore API. [Directo XMLCore Documentation](https://wiki.directo.ee/et/xml_direct)
 
+<a href="https://github.com/5dvision/directo/actions"><img src="https://github.com/5dvision/directo/actions/workflows/tests.yml/badge.svg" alt="Build Status"></a>
 [![PHP Version](https://img.shields.io/badge/php-%5E8.2-blue.svg)](https://php.net)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-## License
-
-MIT License. See [LICENSE](LICENSE) for details.
-
-
-## Features
-
-- 🚀 **Simple API** - Ergonomic, fluent interface for all endpoints
-- 🔒 **Type-safe** - Strict types, PSR-12 compliant, IDE-friendly
-- ✅ **Testable** - Full Guzzle MockHandler support
-- 📋 **Extensible** - Add new endpoints in 5 minutes
-- 🛡️ **Validated** - Optional XSD schema validation
-- 🔧 **Configurable** - Flexible auth, timeouts, and response handling
-
-
-## Requirements
-
-- PHP 8.2+
-- ext-dom
-- ext-libxml
-- guzzlehttp/guzzle ^7.0
-
-## Table of Contents
-
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Configuration](#configuration)
-- [Endpoints](#endpoints)
-- [Error Handling](#error-handling)
-- [Testing](#testing)
-
-### Documentation
-
-| Topic | Description |
-|-------|-------------|
-| **Endpoints** | |
-| [Customers](docs/endpoints/customers.md) | Customer records API (list, put, putBatch) |
-| [Items](docs/endpoints/items.md) | Item/product records API (list, put, putBatch) |
-| [Receipts](docs/endpoints/receipts.md) | Payment receipt records API (list) |
-| **Guides** | |
-| [Schema Validation](docs/schema-validation.md) | XSD validation configuration |
-| [Error Handling](docs/error-handling.md) | Exception types and handling |
-| [Testing](docs/testing.md) | Unit and integration testing |
-| [Adding Endpoints](docs/adding-endpoints.md) | Extending the SDK |
+A modern, type-safe, and testable PHP SDK for integrating with the Directo ERP system via its XMLCore API. It provides a simple fluent interface for managing Customers, Items, Receipts, and more.
 
 ## Installation
+
+> **Requires [PHP 8.2+](https://php.net/releases/)**.
+
+⚡️ Get started by requiring the package using [Composer](https://getcomposer.org):
 
 ```bash
 composer require 5dvision/directo
 ```
 
-## Quick Start
+## Usage
 
 ```php
 <?php
 
 use Directo\Config;
-use Directo\DirectoClient;
+use Directo\Client;
 
-$client = new DirectoClient(new Config(
+$client = new Client(new Config(
     token: 'your-api-token',
 ));
 
@@ -85,6 +47,20 @@ $result = $client->items()->put([
 ]);
 ```
 
+## Documentation
+
+| Topic | Description |
+|-------|-------------|
+| **Endpoints** | |
+| [Customers](docs/endpoints/customers.md) | Customer records API (list, put, putBatch) |
+| [Items](docs/endpoints/items.md) | Item/product records API (list, put, putBatch) |
+| [Receipts](docs/endpoints/receipts.md) | Payment receipt records API (list) |
+| **Guides** | |
+| [Schema Validation](docs/schema-validation.md) | XSD validation configuration |
+| [Error Handling](docs/error-handling.md) | Exception types and handling |
+| [Testing](docs/testing.md) | Unit and integration testing |
+| [Adding Endpoints](docs/adding-endpoints.md) | Extending the SDK |
+
 ## Configuration
 
 ```php
@@ -99,34 +75,10 @@ $config = new Config(
     treatEmptyAsNull: true,             // Empty string handling (default: true)
 );
 
-$client = new DirectoClient($config);
+$client = new Client($config);
 ```
 
-## Endpoints
+## License
 
-📖 [Customers documentation](docs/endpoints/customers.md)
-
-📖 [Items documentation](docs/endpoints/items.md)
-
-📖 [Error handling documentation](docs/error-handling.md)
-
-
-## Testing
-
-```php
-use Directo\DirectoClient;
-use Directo\Transport\MockTransport;
-
-$transport = new MockTransport('<results><item><kood>TEST</kood></item></results>');
-$client = DirectoClient::withTransport($transport);
-
-$items = $client->items()->list();
-// Returns: [['kood' => 'TEST']]
-```
-
-```bash
-./vendor/bin/pest
-```
-
-📖 [Full documentation](docs/testing.md)
+MIT License. See [LICENSE](LICENSE) for details.
 

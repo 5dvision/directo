@@ -23,15 +23,21 @@ composer require --dev pestphp/pest
 ./vendor/bin/pest --coverage
 ```
 
-## Unit Testing with Mock Transport
+## Unit Testing with Guzzle MockHandler
 
-Use `MockTransport` to test without hitting the real API:
+The SDK uses Guzzle for HTTP transport, so the best way to test is using Guzzle's `MockHandler`.
 
 ```php
-use Directo\DirectoClient;
-use Directo\Transport\MockTransport;
+use Directo\Client;
+use Directo\Config;
+use Directo\Http\Transporter;
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
 
 test('lists items', function () {
+    // 1. Create the mock response
     $mockXml = <<<XML
     <?xml version="1.0" encoding="UTF-8"?>
     <results>
@@ -42,8 +48,20 @@ test('lists items', function () {
     </results>
     XML;
 
-    $transport = new MockTransport($mockXml);
-    $client = DirectoClient::withTransport($transport);
+    $mock = new MockHandler([
+        new Response(200, [], $mockXml),
+    ]);
+
+    // 2. Wrap it in a HandlerStack and Guzzle Client
+    $handlerStack = HandlerStack::create($mock);
+    $httpClient = new GuzzleClient(['handler' => $handlerStack]);
+
+    // 3. Create Config and Transporter
+    $config = new Config(token: 'test-token');
+    $transport = new Transporter($config, $httpClient);
+
+    // 4. Create the Directo Client
+    $client = new Client($config, $transport);
 
     $items = $client->items()->list();
 
@@ -56,8 +74,16 @@ test('lists items', function () {
 
 ```php
 test('creates item', function () {
-    $transport = new MockTransport('<results><ok/></results>');
-    $client = DirectoClient::withTransport($transport);
+    $mock = new MockHandler([
+        new Response(200, [], '<results><ok/></results>'),
+    ]);
+    
+    $handlerStack = HandlerStack::create($mock);
+    $httpClient = new GuzzleClient(['handler' => $handlerStack]);
+    
+    $config = new Config(token: 'test-token');
+    $transport = new Transporter($config, $httpClient);
+    $client = new Client($config, $transport);
 
     $result = $client->items()->put([
         'kood' => 'ITEM001',
@@ -66,8 +92,10 @@ test('creates item', function () {
 
     expect($result)->toHaveKey('ok');
     
-    // Verify sent XML
-    $sentBody = $transport->getLastRequestBody();
+    // Verify sent request body
+    $lastRequest = $mock->getLastRequest();
+    exit($lastRequest->getBody()->getContents()); // Or inspect it
+    $sentBody = urldecode((string) $lastRequest->getBody());
     expect($sentBody)->toContain('<artikkel kood="ITEM001">');
 });
 ```
@@ -80,47 +108,18 @@ use Directo\Exception\AuthenticationException;
 
 test('handles auth error', function () {
     $errorXml = '<results><result type="5">Invalid token</result></results>';
-    $transport = new MockTransport($errorXml);
-    $client = DirectoClient::withTransport($transport);
-
-    expect(fn() => $client->items()->list())
-        ->toThrow(AuthenticationException::class);
-});
-
-test('handles API error', function () {
-    $errorXml = '<error desc="Item not found"/>';
-    $transport = new MockTransport($errorXml);
-    $client = DirectoClient::withTransport($transport);
-
-    expect(fn() => $client->items()->list())
-        ->toThrow(ApiErrorException::class);
-});
-```
-
-## Testing with Guzzle MockHandler
-
-For more control over HTTP responses:
-
-```php
-use GuzzleHttp\Client;
-use GuzzleHttp\Handler\MockHandler;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Psr7\Response;
-use Directo\Transport\GuzzleTransport;
-
-test('handles HTTP error', function () {
+    
     $mock = new MockHandler([
-        new Response(500, [], 'Internal Server Error'),
+        new Response(200, [], $errorXml),
     ]);
+    $httpClient = new GuzzleClient(['handler' => HandlerStack::create($mock)]);
     
-    $handlerStack = HandlerStack::create($mock);
-    $httpClient = new Client(['handler' => $handlerStack]);
-    
-    $transport = new GuzzleTransport($httpClient, 'test-token');
-    $client = DirectoClient::withTransport($transport);
+    $config = new Config(token: 'test-token');
+    $transport = new Transporter($config, $httpClient);
+    $client = new Client($config, $transport);
 
     expect(fn() => $client->items()->list())
-        ->toThrow(TransportException::class);
+        ->toThrow(AuthenticationException::class); // Note: AuthenticationException needs to be implemented/mapped if you have specific logic for it, otherwise it might be ApiErrorException
 });
 ```
 
@@ -136,7 +135,7 @@ test('integration: lists items from real API', function () {
         $this->markTestSkipped('DIRECTO_TOKEN not set');
     }
 
-    $client = new DirectoClient($token);
+    $client = new Client($token);
     $items = $client->items()->list(['closed' => 0]);
 
     expect($items)->toBeArray();
@@ -156,10 +155,25 @@ Create reusable test helpers:
 ```php
 // tests/Helpers.php
 
-function mockClient(string $responseXml): DirectoClient
+use Directo\Client;
+use Directo\Config;
+use Directo\Http\Transporter;
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Handler\MockHandler;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
+
+function mockClient(string $responseXml): Client
 {
-    $transport = new MockTransport($responseXml);
-    return DirectoClient::withTransport($transport);
+    $mock = new MockHandler([
+        new Response(200, [], $responseXml),
+    ]);
+    $httpClient = new GuzzleClient(['handler' => HandlerStack::create($mock)]);
+    
+    $config = new Config(token: 'test-token');
+    $transport = new Transporter($config, $httpClient);
+    
+    return new Client($config, $transport);
 }
 
 function itemsXml(array $items): string

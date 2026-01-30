@@ -21,11 +21,8 @@ use GuzzleHttp\Exception\GuzzleException;
  * - Idempotent: safe to run multiple times
  * - Reports progress for CLI usage
  */
-final class SchemaDownloader
+final readonly class SchemaDownloader
 {
-    /** @var ClientInterface HTTP client for downloading schemas */
-    private ClientInterface $httpClient;
-
     /**
      * Create a new schema downloader.
      *
@@ -33,15 +30,11 @@ final class SchemaDownloader
      * @param  string  $schemaBaseUrl  Base URL for downloading schemas
      * @param  ClientInterface|null  $httpClient  Optional HTTP client (for testing)
      */
-    public function __construct(
-        private readonly string $outputPath,
-        private readonly string $schemaBaseUrl,
-        ?ClientInterface $httpClient = null,
-    ) {
-        $this->httpClient = $httpClient ?? new Client([
-            'timeout' => 30.0,
-            'connect_timeout' => 10.0,
-        ]);
+    public function __construct(private string $outputPath, private string $schemaBaseUrl, private ?ClientInterface $httpClient = new Client([
+        'timeout' => 30.0,
+        'connect_timeout' => 10.0,
+    ]))
+    {
     }
 
     /**
@@ -85,9 +78,12 @@ final class SchemaDownloader
             }
 
             $reflection = new \ReflectionClass($className);
-
             // Skip abstract classes and interfaces
-            if ($reflection->isAbstract() || $reflection->isInterface()) {
+            if ($reflection->isAbstract()) {
+                continue;
+            }
+
+            if ($reflection->isInterface()) {
                 continue;
             }
 
@@ -119,8 +115,12 @@ final class SchemaDownloader
             $instance = $reflection->newInstanceWithoutConstructor();
             $endpointSchemas = $instance->schemas();
 
-            foreach ($endpointSchemas as $operation => $schemaFile) {
-                if ($schemaFile === null || isset($seen[$schemaFile])) {
+            foreach ($endpointSchemas as $schemaFile) {
+                if ($schemaFile === null) {
+                    continue;
+                }
+
+                if (isset($seen[$schemaFile])) {
                     continue;
                 }
 
@@ -150,8 +150,8 @@ final class SchemaDownloader
 
         try {
             $this->ensureOutputDirectory();
-        } catch (\RuntimeException $e) {
-            $logger("ERROR: {$e->getMessage()}");
+        } catch (\RuntimeException $runtimeException) {
+            $logger('ERROR: ' . $runtimeException->getMessage());
 
             return $results;
         }
@@ -161,21 +161,21 @@ final class SchemaDownloader
             $file = $schema['file'];
             $targetPath = $this->outputPath.'/'.$file;
 
-            $logger("Downloading: {$url}");
+            $logger('Downloading: ' . $url);
 
             try {
                 $response = $this->httpClient->request('GET', $url);
                 $content = (string) $response->getBody();
 
                 if (file_put_contents($targetPath, $content) === false) {
-                    $results['failed'][$file] = "Failed to write file: {$targetPath}";
+                    $results['failed'][$file] = 'Failed to write file: ' . $targetPath;
                     $logger('  ERROR: Failed to write file');
 
                     continue;
                 }
 
                 $results['success'][$file] = $targetPath;
-                $logger("  OK: Saved to {$file}");
+                $logger('  OK: Saved to ' . $file);
             } catch (GuzzleException $e) {
                 $results['failed'][$file] = $e->getMessage();
                 $logger('  ERROR: '.$e->getMessage());
@@ -211,11 +211,11 @@ final class SchemaDownloader
             }
 
             return $targetPath;
-        } catch (GuzzleException $e) {
+        } catch (GuzzleException $guzzleException) {
             throw new \RuntimeException(
-                sprintf('Failed to download schema from %s: %s', $url, $e->getMessage()),
+                sprintf('Failed to download schema from %s: %s', $url, $guzzleException->getMessage()),
                 0,
-                $e,
+                $guzzleException,
             );
         }
     }

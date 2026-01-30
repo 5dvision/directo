@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-use Directo\Parser\XmlRequestBuilder;
+use Directo\Http\RequestBuilder;
 
-describe('XmlRequestBuilder', function () {
-    test('builds item XML with code as attribute', function () {
-        $builder = new XmlRequestBuilder();
+describe('RequestBuilder', function (): void {
+    test('builds item XML with code as attribute', function (): void {
+        $builder = new RequestBuilder();
 
         $xml = $builder->build('artiklid', 'artikkel', [
             'kood' => 'ITEM001',
@@ -23,8 +23,8 @@ describe('XmlRequestBuilder', function () {
         expect($xml)->toContain('</artiklid>');
     });
 
-    test('builds customer XML with code as attribute', function () {
-        $builder = new XmlRequestBuilder();
+    test('builds customer XML with code as attribute', function (): void {
+        $builder = new RequestBuilder();
 
         $xml = $builder->build('kliendid', 'klient', [
             'kood' => 'CUST001',
@@ -38,8 +38,8 @@ describe('XmlRequestBuilder', function () {
         expect($xml)->toContain('</kliendid>');
     });
 
-    test('builds XML without key attribute when not specified', function () {
-        $builder = new XmlRequestBuilder();
+    test('builds XML without key attribute when not specified', function (): void {
+        $builder = new RequestBuilder();
 
         $xml = $builder->build('items', 'item', [
             'name' => 'Test',
@@ -52,8 +52,8 @@ describe('XmlRequestBuilder', function () {
         expect($xml)->not->toContain('kood=');
     });
 
-    test('handles boolean values', function () {
-        $builder = new XmlRequestBuilder();
+    test('handles boolean values', function (): void {
+        $builder = new RequestBuilder();
 
         $xml = $builder->build('artiklid', 'artikkel', [
             'aktiivne' => true,
@@ -64,8 +64,8 @@ describe('XmlRequestBuilder', function () {
         expect($xml)->toContain('<suletud>0</suletud>');
     });
 
-    test('handles null values as empty strings', function () {
-        $builder = new XmlRequestBuilder();
+    test('handles null values as empty strings', function (): void {
+        $builder = new RequestBuilder();
 
         $xml = $builder->build('artiklid', 'artikkel', [
             'kirjeldus' => null,
@@ -74,8 +74,8 @@ describe('XmlRequestBuilder', function () {
         expect($xml)->toContain('<kirjeldus></kirjeldus>');
     });
 
-    test('handles numeric values', function () {
-        $builder = new XmlRequestBuilder();
+    test('handles numeric values', function (): void {
+        $builder = new RequestBuilder();
 
         $xml = $builder->build('artiklid', 'artikkel', [
             'hind' => 99.99,
@@ -86,8 +86,8 @@ describe('XmlRequestBuilder', function () {
         expect($xml)->toContain('<kogus>100</kogus>');
     });
 
-    test('buildBatch creates multiple records', function () {
-        $builder = new XmlRequestBuilder();
+    test('buildBatch creates multiple records', function (): void {
+        $builder = new RequestBuilder();
 
         $xml = $builder->buildBatch('artiklid', 'artikkel', [
             ['kood' => 'ITEM001', 'nimetus' => 'Item 1'],
@@ -102,8 +102,8 @@ describe('XmlRequestBuilder', function () {
         expect($xml)->toContain('</artiklid>');
     });
 
-    test('handles nested associative arrays', function () {
-        $builder = new XmlRequestBuilder();
+    test('handles nested associative arrays', function (): void {
+        $builder = new RequestBuilder();
 
         $xml = $builder->build('artiklid', 'artikkel', [
             'dimensions' => [
@@ -118,8 +118,8 @@ describe('XmlRequestBuilder', function () {
         expect($xml)->toContain('</dimensions>');
     });
 
-    test('handles list arrays with same element name', function () {
-        $builder = new XmlRequestBuilder();
+    test('handles list arrays with same element name', function (): void {
+        $builder = new RequestBuilder();
 
         $xml = $builder->build('artiklid', 'artikkel', [
             'tag' => ['electronics', 'sale', 'featured'],
@@ -130,8 +130,8 @@ describe('XmlRequestBuilder', function () {
         expect($xml)->toContain('<tag>featured</tag>');
     });
 
-    test('handles custom element names for any endpoint', function () {
-        $builder = new XmlRequestBuilder();
+    test('handles custom element names for any endpoint', function (): void {
+        $builder = new RequestBuilder();
 
         // Can build XML for any endpoint without modifying XmlRequestBuilder
         $xml = $builder->build('tellimused', 'tellimus', [
