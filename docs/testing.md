@@ -135,7 +135,7 @@ test('integration: lists items from real API', function () {
         $this->markTestSkipped('DIRECTO_TOKEN not set');
     }
 
-    $client = new Client($token);
+    $client = new Client(new Config(token: $token));
     $items = $client->items()->list(['closed' => 0]);
 
     expect($items)->toBeArray();

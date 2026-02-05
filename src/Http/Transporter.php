@@ -112,7 +112,7 @@ final readonly class Transporter implements TransporterContract
             'status' => $response->getStatusCode(),
             'duration_ms' => $duration,
             'body_length' => strlen($body),
-            'body_preview' => mb_substr($body, 0, 500).(strlen($body) > 500 ? '...' : ''),
+            'body_preview' => mb_substr($body, 0, 500) . (strlen($body) > 500 ? '...' : ''),
             'context' => $context,
         ]);
 
@@ -128,7 +128,7 @@ final readonly class Transporter implements TransporterContract
     {
         $duration = round((microtime(true) - $startTime) * 1000, 2);
 
-        $this->logger->error('Directo API error: '.$message, [
+        $this->logger->error('Directo API error: ' . $message, [
             'exception' => $exception::class,
             'message' => $exception->getMessage(),
             'duration_ms' => $duration,

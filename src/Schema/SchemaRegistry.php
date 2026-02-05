@@ -71,7 +71,11 @@ final readonly class SchemaRegistry
      */
     public function getSchemaPath(string $schemaFile): string
     {
-        return $this->schemaBasePath.'/'.$schemaFile;
+        if (file_exists($schemaFile)) {
+            return $schemaFile;
+        }
+
+        return $this->schemaBasePath . '/' . $schemaFile;
     }
 
     /**
@@ -93,7 +97,7 @@ final readonly class SchemaRegistry
      */
     public function getSchemaUrl(string $schemaFile): string
     {
-        return $this->schemaBaseUrl.$schemaFile;
+        return $this->schemaBaseUrl . $schemaFile;
     }
 
     /**
@@ -106,43 +110,12 @@ final readonly class SchemaRegistry
      * @throws SchemaValidationException If validation fails
      * @throws \InvalidArgumentException If schema file not found
      */
-    public function validateFile(
+    public function validateXml(
         string $xml,
         string $schemaFile,
         array $context = [],
     ): void {
-        $schemaPath = $this->getSchemaPath($schemaFile);
-
-        if (! file_exists($schemaPath)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'Schema file not found: %s. Run "composer schemas:update" to download schemas.',
-                    $schemaPath,
-                ),
-            );
-        }
-
-        // Capture libxml errors
-        $previousUseErrors = libxml_use_internal_errors(true);
-        libxml_clear_errors();
-
-        try {
-            $dom = new DOMDocument();
-            $dom->loadXML($xml, LIBXML_NOBLANKS);
-
-            if (! $dom->schemaValidate($schemaPath)) {
-                $errors = libxml_get_errors();
-                libxml_clear_errors();
-
-                throw new SchemaValidationException(
-                    sprintf('XML does not conform to schema: %s', $schemaFile),
-                    $errors,
-                    $schemaPath,
-                    array_merge($context, ['schemaFile' => $schemaFile]),
-                );
-            }
-        } finally {
-            libxml_use_internal_errors($previousUseErrors);
-        }
+        $validator = new SchemaValidator();
+        $validator->validate($xml, $this->getSchemaPath($schemaFile), $context);
     }
 }

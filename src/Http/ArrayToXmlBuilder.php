@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Directo\Http;
 
 use DOMDocument;
-use Exception;
 use SimpleXMLElement;
 
 /**
@@ -14,29 +13,43 @@ use SimpleXMLElement;
 final class ArrayToXmlBuilder
 {
     /**
-     * @param array<string, mixed> $data
+     * Convert an array to an XML string.
+     *
+     * @param array<string, mixed> $data The array to convert
+     * @param string|null $rootElement The name of the root element (default: 'root')
+     * @param string $version The XML version (default: '1.0')
+     * @param string $encoding The XML encoding (default: 'utf-8')
+     * @param bool $pretty Whether to format the output with indentation and newlines (default: false)
+     *
+     * @return string The generated XML string
      */
     public static function arrayToXml(
         array $data,
         ?string $rootElement = null,
         string $version = '1.0',
-        string $encoding = 'utf-8'
+        string $encoding = 'utf-8',
+        bool $pretty = false
     ): string {
-        if ($rootElement) {
-            $xml = new SimpleXMLElement(
-                sprintf('<?xml version="%s" encoding="%s"?><%s/>', $version, $encoding, $rootElement)
-            );
-            self::arrayToXmlRecursive($data, $xml);
-
-            return $xml->asXML();
-        }
-
         $xml = new SimpleXMLElement(
-            sprintf('<?xml version="%s" encoding="%s"?><root/>', $version, $encoding)
+            sprintf(
+                '<?xml version="%s" encoding="%s"?><%s/>',
+                $version,
+                $encoding,
+                $rootElement ?? 'root'
+            )
         );
+
         self::arrayToXmlRecursive($data, $xml);
 
         $xmlString = $xml->asXML();
+
+        if ($pretty) {
+            $xmlString = self::prettyPrint($xmlString);
+        }
+
+        if ($rootElement !== null) {
+            return $xmlString;
+        }
 
         return preg_replace(
             '/<\?xml[^>]+>\s*<root>(.*)<\/root>/s',
@@ -91,6 +104,13 @@ final class ArrayToXmlBuilder
         }
     }
 
+    /**
+     * Sanitize a value for XML output.
+     *
+     * @param mixed $value The value to sanitize
+     *
+     * @return string The sanitized value
+     */
     private static function sanitizeValue(mixed $value): string
     {
         if ($value === null) {
@@ -102,6 +122,13 @@ final class ArrayToXmlBuilder
         return htmlspecialchars($value, ENT_XML1 | ENT_QUOTES, 'UTF-8');
     }
 
+    /**
+     * Format an XML string with indentation and newlines.
+     *
+     * @param string $xml The XML string to format
+     *
+     * @return string The formatted XML string
+     */
     public static function prettyPrint(string $xml): string
     {
         $dom = new DOMDocument('1.0');
@@ -112,27 +139,21 @@ final class ArrayToXmlBuilder
         return $dom->saveXML();
     }
 
-    public static function validateXsd(string $xml, string $xsdPath): bool
+    /**
+     * Validate XML against an XSD schema.
+     *
+     * @param string $xml The XML string to validate
+     * @param string $xsdPath The path to the XSD schema file
+     *
+     * @return bool True if validation passes
+     *
+     * @throws \Directo\Exception\SchemaValidationException If validation fails
+     * @throws \InvalidArgumentException If schema file is not found
+     */
+    public static function validateXml(string $xml, string $xsdPath): bool
     {
-        if (! file_exists($xsdPath)) {
-            throw new Exception('XSD file not found: ' . $xsdPath);
-        }
-
-        libxml_use_internal_errors(true);
-
-        $dom = new DOMDocument();
-        $dom->loadXML($xml);
-
-        if (! $dom->schemaValidate($xsdPath)) {
-            $errors = libxml_get_errors();
-            $errorMessages = array_map(fn (\LibXMLError $error): string => sprintf('Line %d: %s', $error->line, trim($error->message)), $errors);
-
-            libxml_clear_errors();
-
-            throw new Exception("XML validation failed:\n".implode("\n", $errorMessages));
-        }
-
-        libxml_clear_errors();
+        $validator = new \Directo\Schema\SchemaValidator();
+        $validator->validate($xml, $xsdPath);
 
         return true;
     }

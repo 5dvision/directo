@@ -77,7 +77,7 @@ abstract class AbstractEndpoint implements Endpoint
 
         // Optional schema validation (using endpoint-defined schema)
         if ($this->config->validateSchema && ($schema = $this->schemas()['list'] ?? null)) {
-            $this->schemaRegistry->validateFile($responseXml, $schema, $context);
+            $this->schemaRegistry->validateXml($responseXml, $schema, $context);
         }
 
         return $this->parser->parse($responseXml, $context);
@@ -211,7 +211,7 @@ abstract class AbstractEndpoint implements Endpoint
 
         // Validate request XML against input schema if enabled (using endpoint-defined schema)
         if ($this->config->validateSchema && ($schema = $this->schemas()['put'] ?? null)) {
-            $this->schemaRegistry->validateFile($xmlData, $schema, $context);
+            $this->schemaRegistry->validateXml($xmlData, $schema, $context);
         }
 
         $formParams = [
@@ -226,5 +226,18 @@ abstract class AbstractEndpoint implements Endpoint
         $this->errorDetector->detectAndThrow($responseXml, $context);
 
         return $this->parser->parse($responseXml, $context);
+    }
+
+    /**
+     * Send a PUT request with raw XML data.
+     *
+     * Useful when you have pre-built XML or want to bypass the array-to-XML builder.
+     *
+     * @param  string  $xmlData  The complete XML body
+     * @return array<string, mixed>
+     */
+    public function putRaw(string $xmlData): array
+    {
+        return $this->sendPutRequest($xmlData);
     }
 }

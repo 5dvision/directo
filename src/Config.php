@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Directo;
 
+use SensitiveParameter;
+
 /**
  * SDK configuration container.
  *
@@ -42,8 +44,8 @@ final readonly class Config
     public const DEFAULT_CONNECT_TIMEOUT = 10.0;
 
     /**
-     * @param  string  $token  API token value (never logged/exposed)
      * @param  string  $baseUrl  Full base URL for API requests
+     * @param  string  $token  API token value (never logged/exposed)
      * @param  string  $tokenParamName  Token parameter name ('token')
      * @param  float  $timeout  Request timeout in seconds
      * @param  float  $connectTimeout  Connection timeout in seconds
@@ -55,8 +57,9 @@ final readonly class Config
      * @throws \InvalidArgumentException If token is empty
      */
     public function __construct(
-        public string $token,
         public string $baseUrl = self::DEFAULT_BASE_URL,
+        #[SensitiveParameter]
+        public string $token = '',
         public string $tokenParamName = self::DEFAULT_TOKEN_PARAM,
         public float $timeout = self::DEFAULT_TIMEOUT,
         public float $connectTimeout = self::DEFAULT_CONNECT_TIMEOUT,
@@ -83,6 +86,6 @@ final readonly class Config
             return $this->schemaBasePath;
         }
 
-        return dirname(__DIR__).'/resources/xsd';
+        return dirname(__DIR__) . '/resources/xsd';
     }
 }

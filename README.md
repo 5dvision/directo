@@ -48,6 +48,7 @@ $items = $client->items()->list([
 | [Customers](docs/endpoints/customers.md) | Customer records API (list, put, putBatch) |
 | [Items](docs/endpoints/items.md) | Item/product records API (list, put, putBatch) |
 | [Receipts](docs/endpoints/receipts.md) | Payment receipt records API (list) |
+| [XmlCore (Custom)](docs/endpoints/xmlcore.md) | Custom queries (put, putArray, putRaw) |
 | **Guides** | |
 | [Schema Validation](docs/schema-validation.md) | XSD validation configuration |
 | [Error Handling](docs/error-handling.md) | Exception types and handling |
@@ -60,12 +61,13 @@ $items = $client->items()->list([
 use Directo\Config;
 
 $config = new Config(
-    token: 'your-api-token',           // Required: API token
-    tokenParamName: 'token',            // 'token' or 'key' (default: 'token')
-    timeout: 30.0,                      // Request timeout (default: 30s)
-    connectTimeout: 10.0,               // Connection timeout (default: 10s)
-    validateSchema: false,              // XSD validation (default: false)
-    treatEmptyAsNull: true,             // Empty string handling (default: true)
+    baseUrl: 'https://login.directo.ee/...', // Optional: Base URL
+    token: 'your-api-token',                 // Required: API token
+    tokenParamName: 'token',                 // 'token' or 'key' (default: 'token')
+    timeout: 30.0,                           // Request timeout (default: 30s)
+    connectTimeout: 10.0,                    // Connection timeout (default: 10s)
+    validateSchema: false,                   // XSD validation (default: false)
+    treatEmptyAsNull: true,                  // Empty string handling (default: true)
 );
 
 $client = new Client($config);

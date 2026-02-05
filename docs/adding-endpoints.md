@@ -87,7 +87,7 @@ The `EndpointInterface` requires these methods:
 | `xmlElements()` | XML structure for PUT | `['root' => 'tellimused', ...]` |
 | `schemas()` | Schema files per operation | `['list' => 'ws_tellimused.xsd']` |
 
-Plus inherited operations: `list()`, `put()`, `putBatch()`
+Plus inherited operations: `list()`, `put()`, `putBatch()`, `putRaw()`
 
 ## Complete Example
 

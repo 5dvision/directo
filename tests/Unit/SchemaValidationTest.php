@@ -45,16 +45,16 @@ describe('SchemaRegistry', function (): void {
     });
 
     test('schemaFileExists returns true when file exists', function (): void {
-        $tempDir = sys_get_temp_dir().'/directo-test-'.uniqid();
+        $tempDir = sys_get_temp_dir() . '/directo-test-' . uniqid();
         mkdir($tempDir);
-        file_put_contents($tempDir.'/ws_test.xsd', '<schema/>');
+        file_put_contents($tempDir . '/ws_test.xsd', '<schema/>');
 
         $registry = new SchemaRegistry($tempDir, Config::DEFAULT_SCHEMA_BASE_URL);
 
         expect($registry->schemaFileExists('ws_test.xsd'))->toBeTrue();
 
         // Cleanup
-        unlink($tempDir.'/ws_test.xsd');
+        unlink($tempDir . '/ws_test.xsd');
         rmdir($tempDir);
     });
 });
@@ -62,7 +62,7 @@ describe('SchemaRegistry', function (): void {
 describe('Schema Validation', function (): void {
     beforeEach(function (): void {
         // Create a minimal valid XSD for testing
-        $this->tempDir = sys_get_temp_dir().'/directo-test-'.uniqid();
+        $this->tempDir = sys_get_temp_dir() . '/directo-test-' . uniqid();
         mkdir($this->tempDir);
 
         // Minimal XSD that accepts any XML
@@ -79,13 +79,13 @@ describe('Schema Validation', function (): void {
 </xs:schema>
 XSD;
 
-        file_put_contents($this->tempDir.'/ws_kliendid.xsd', $minimalXsd);
+        file_put_contents($this->tempDir . '/ws_kliendid.xsd', $minimalXsd);
     });
 
     afterEach(function (): void {
         // Cleanup
         if (property_exists($this, 'tempDir') && $this->tempDir !== null && is_dir($this->tempDir)) {
-            array_map(unlink(...), glob($this->tempDir.'/*'));
+            array_map(unlink(...), glob($this->tempDir . '/*'));
             rmdir($this->tempDir);
         }
     });
@@ -96,7 +96,7 @@ XSD;
         $xml = '<?xml version="1.0"?><results><customer><kood>TEST</kood></customer></results>';
 
         // Should not throw
-        $registry->validateFile($xml, 'ws_kliendid.xsd');
+        $registry->validateXml($xml, 'ws_kliendid.xsd');
 
         expect(true)->toBeTrue(); // If we get here, validation passed
     });
@@ -122,13 +122,13 @@ XSD;
 </xs:schema>
 XSD;
 
-        file_put_contents($this->tempDir.'/ws_kliendid.xsd', $strictXsd);
+        file_put_contents($this->tempDir . '/ws_kliendid.xsd', $strictXsd);
         $registry = new SchemaRegistry($this->tempDir, Config::DEFAULT_SCHEMA_BASE_URL);
 
         // XML missing required 'kood' element
         $invalidXml = '<?xml version="1.0"?><results><customer><invalid>TEST</invalid></customer></results>';
 
-        $registry->validateFile($invalidXml, 'ws_kliendid.xsd');
+        $registry->validateXml($invalidXml, 'ws_kliendid.xsd');
     })->throws(SchemaValidationException::class);
 
     test('SchemaValidationException contains error details', function (): void {
@@ -145,11 +145,11 @@ XSD;
 </xs:schema>
 XSD;
 
-        file_put_contents($this->tempDir.'/ws_kliendid.xsd', $strictXsd);
+        file_put_contents($this->tempDir . '/ws_kliendid.xsd', $strictXsd);
         $registry = new SchemaRegistry($this->tempDir, Config::DEFAULT_SCHEMA_BASE_URL);
 
         try {
-            $registry->validateFile('<?xml version="1.0"?><results></results>', 'ws_kliendid.xsd');
+            $registry->validateXml('<?xml version="1.0"?><results></results>', 'ws_kliendid.xsd');
         } catch (SchemaValidationException $schemaValidationException) {
             expect($schemaValidationException->getValidationErrors())->toBeArray();
             expect($schemaValidationException->getFormattedErrors())->toBeArray();
@@ -160,6 +160,6 @@ XSD;
     test('throws when schema file does not exist', function (): void {
         $registry = new SchemaRegistry('/nonexistent/path', Config::DEFAULT_SCHEMA_BASE_URL);
 
-        $registry->validateFile('<results/>', 'ws_kliendid.xsd');
+        $registry->validateXml('<results/>', 'ws_kliendid.xsd');
     })->throws(InvalidArgumentException::class, 'Schema file not found');
 });

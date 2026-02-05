@@ -14,6 +14,7 @@ use Directo\Http\ResponseParser;
 use Directo\Http\Transporter;
 use Directo\Contract\Transporter as TransporterContract;
 use Directo\Schema\SchemaRegistry;
+use Directo\Endpoint\XmlCoreEndpoint;
 
 /**
  * Directo XMLCore API client.
@@ -137,6 +138,21 @@ final class Client
     public function receipts(): ReceiptsEndpoint
     {
         return $this->receiptsEndpoint ??= $this->createEndpoint(ReceiptsEndpoint::class);
+    }
+
+    /**
+     * Access a generic XmlCore endpoint.
+     *
+     * @param  string  $what  The endpoint name (e.g. 'invoice')
+     * @return XmlCoreEndpoint Configurable endpoint instance
+     */
+    public function xmlCore(string $what): XmlCoreEndpoint
+    {
+        /** @var XmlCoreEndpoint $endpoint */
+        $endpoint = $this->createEndpoint(XmlCoreEndpoint::class);
+        $endpoint->setWhat($what);
+
+        return $endpoint;
     }
 
     /**
