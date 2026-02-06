@@ -67,7 +67,7 @@ final class XmlCoreEndpoint extends AbstractEndpoint
     }
 
     /**
-     * Convert arbitrary array to XML and send as PUT request.
+     * Converts arbitrary array to XML and sends as PUT request.
      *
      * @param  array<string, mixed>  $data  Full array structure (including root element)
      * @return array<string, mixed>

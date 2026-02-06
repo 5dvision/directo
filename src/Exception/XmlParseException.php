@@ -32,7 +32,7 @@ class XmlParseException extends DirectoException
     }
 
     /**
-     * Get libxml errors.
+     * Returns libxml errors.
      *
      * @return array<int, \LibXMLError>
      */
@@ -42,7 +42,7 @@ class XmlParseException extends DirectoException
     }
 
     /**
-     * Get formatted error messages.
+     * Returns formatted error messages.
      *
      * @return array<int, string>
      */
@@ -66,7 +66,7 @@ class XmlParseException extends DirectoException
     }
 
     /**
-     * Get the raw XML that failed to parse (truncated for safety).
+     * Returns the raw XML that failed to parse (truncated for safety).
      *
      * @param  int  $maxLength  Maximum length to return
      * @return string Truncated XML content
@@ -77,6 +77,6 @@ class XmlParseException extends DirectoException
             return $this->rawXml;
         }
 
-        return substr($this->rawXml, 0, $maxLength).'... (truncated)';
+        return substr($this->rawXml, 0, $maxLength) . '... (truncated)';
     }
 }

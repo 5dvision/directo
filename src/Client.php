@@ -111,9 +111,9 @@ final class Client
     }
 
     /**
-     * Access the Customers endpoint.
+     * Returns Customers endpoint instance.
      *
-     * @return CustomersEndpoint Customers endpoint instance
+     * @return CustomersEndpoint
      */
     public function customers(): CustomersEndpoint
     {
@@ -121,9 +121,9 @@ final class Client
     }
 
     /**
-     * Access the Items endpoint.
+     * Returns Items endpoint instance.
      *
-     * @return ItemsEndpoint Items endpoint instance
+     * @return ItemsEndpoint
      */
     public function items(): ItemsEndpoint
     {
@@ -131,9 +131,9 @@ final class Client
     }
 
     /**
-     * Access the Receipts endpoint.
+     * Returns Receipts endpoint instance.
      *
-     * @return ReceiptsEndpoint Receipts endpoint instance
+     * @return ReceiptsEndpoint
      */
     public function receipts(): ReceiptsEndpoint
     {
@@ -141,10 +141,10 @@ final class Client
     }
 
     /**
-     * Access a generic XmlCore endpoint.
+     * Returns a generic XmlCore endpoint.
      *
      * @param  string  $what  The endpoint name (e.g. 'invoice')
-     * @return XmlCoreEndpoint Configurable endpoint instance
+     * @return XmlCoreEndpoint
      */
     public function xmlCore(string $what): XmlCoreEndpoint
     {
@@ -156,16 +156,17 @@ final class Client
     }
 
     /**
-     * Create an endpoint instance with all dependencies.
+     * Creates an endpoint instance with all dependencies.
      *
      * @template T of Endpoint
      *
-     * @param  class-string<T>  $class  Endpoint class name
-     * @return T Endpoint instance
+     * @param  class-string<T>  $class
+     * @return T
      */
     private function createEndpoint(string $class): Endpoint
     {
-        return new $class(
+        /** @var Endpoint $endpoint */
+        $endpoint = new $class(
             $this->config,
             $this->transport,
             $this->schemaRegistry,
@@ -173,14 +174,16 @@ final class Client
             $this->errorDetector,
             $this->xmlBuilder,
         );
+
+        return $endpoint;
     }
 
     /**
-     * Get the current configuration.
+     * Returns the current configuration.
      *
      * Useful for debugging or extending functionality.
      *
-     * @return Config SDK configuration
+     * @return Config
      */
     public function getConfig(): Config
     {
@@ -188,11 +191,11 @@ final class Client
     }
 
     /**
-     * Get the transport layer.
+     * Returns the transport layer.
      *
      * Useful for advanced use cases or testing.
      *
-     * @return TransporterContract HTTP transport
+     * @return TransporterContract
      */
     public function getTransport(): TransporterContract
     {
@@ -200,11 +203,11 @@ final class Client
     }
 
     /**
-     * Get the schema registry.
+     * Returns the schema registry.
      *
      * Useful for registering custom schemas at runtime.
      *
-     * @return SchemaRegistry Schema registry instance
+     * @return SchemaRegistry
      *
      * @example Register custom schema
      * ```php

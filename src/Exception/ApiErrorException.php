@@ -34,7 +34,7 @@ final class ApiErrorException extends DirectoException
     }
 
     /**
-     * Get all error messages extracted from the response.
+     * Returns all error messages extracted from the response.
      *
      * @return array<int, string>
      */
@@ -44,7 +44,7 @@ final class ApiErrorException extends DirectoException
     }
 
     /**
-     * Get the raw XML error response.
+     * Returns the raw XML error response.
      */
     public function getRawXml(): string
     {
@@ -52,7 +52,7 @@ final class ApiErrorException extends DirectoException
     }
 
     /**
-     * Check if there are multiple errors.
+     * Checks if there are multiple errors.
      */
     public function hasMultipleErrors(): bool
     {
@@ -60,7 +60,7 @@ final class ApiErrorException extends DirectoException
     }
 
     /**
-     * Get errors as a formatted string list.
+     * Returns errors as a formatted string list.
      *
      * @return array<int, string> Formatted error strings
      */

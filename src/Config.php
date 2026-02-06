@@ -74,7 +74,7 @@ final readonly class Config
     }
 
     /**
-     * Get the resolved schema base path (local directory).
+     * Returns the resolved schema base path (local directory).
      *
      * Falls back to the bundled schemas directory if not configured.
      *

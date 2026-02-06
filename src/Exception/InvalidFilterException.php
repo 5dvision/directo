@@ -17,7 +17,7 @@ namespace Directo\Exception;
 class InvalidFilterException extends DirectoException
 {
     /**
-     * Create exception for unknown filter keys.
+     * Creates exception for unknown filter keys.
      *
      * @param  array<int, string>  $unknownKeys  Filter keys that are not allowed
      * @param  array<int, string>  $allowedKeys  List of allowed filter keys
@@ -44,7 +44,7 @@ class InvalidFilterException extends DirectoException
     }
 
     /**
-     * Create exception for invalid filter value type.
+     * Creates exception for invalid filter value type.
      *
      * @param  string  $key  Filter key
      * @param  mixed  $value  The invalid value

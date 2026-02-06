@@ -76,7 +76,8 @@ abstract class AbstractEndpoint implements Endpoint
         $this->errorDetector->detectAndThrow($responseXml, $context);
 
         // Optional schema validation (using endpoint-defined schema)
-        if ($this->config->validateSchema && ($schema = $this->schemas()['list'] ?? null)) {
+        $schema = $this->schemas()['list'] ?? null;
+        if ($this->config->validateSchema && is_string($schema)) {
             $this->schemaRegistry->validateXml($responseXml, $schema, $context);
         }
 
@@ -84,11 +85,10 @@ abstract class AbstractEndpoint implements Endpoint
     }
 
     /**
-     * Validate filters against allowed list.
+     * Validates filters against allowed list.
      *
      * @param  array<string, mixed>  $filters
-     *
-     * @throws InvalidFilterException If unknown or invalid filters
+     * @throws InvalidFilterException
      */
     protected function validateFilters(array $filters): void
     {
@@ -109,7 +109,10 @@ abstract class AbstractEndpoint implements Endpoint
     }
 
     /**
-     * Check if filter value is valid (scalar or Stringable).
+     * Checks if filter value is valid (scalar or Stringable).
+     *
+     * @param  mixed  $value
+     * @return bool
      */
     protected function isValidFilterValue(mixed $value): bool
     {
@@ -117,7 +120,7 @@ abstract class AbstractEndpoint implements Endpoint
     }
 
     /**
-     * Build form parameters for the request.
+     * Builds form parameters for the request.
      *
      * @param  array<string, scalar|Stringable>  $filters
      * @return array<string, string|int>
@@ -138,7 +141,7 @@ abstract class AbstractEndpoint implements Endpoint
     }
 
     /**
-     * Build context for error reporting.
+     * Builds context for error reporting.
      *
      * @param  array<string, mixed>  $filters
      * @return array<string, mixed>
@@ -155,14 +158,9 @@ abstract class AbstractEndpoint implements Endpoint
     /**
      * {@inheritDoc}
      */
-    /**
-     * {@inheritDoc}
-     *
-     * @param array<string, mixed> $data
-     * @return array<string, mixed>
-     */
     public function put(array $data): array
     {
+        /** @var array{root: string, record: string, key?: string} $elements */
         $elements = $this->xmlElements();
         $xmlData = $this->xmlBuilder->build(
             $elements['root'],
@@ -176,12 +174,10 @@ abstract class AbstractEndpoint implements Endpoint
 
     /**
      * {@inheritDoc}
-     *
-     * @param array<int, array<string, mixed>> $records
-     * @return array<string, mixed>
      */
     public function putBatch(array $records): array
     {
+        /** @var array{root: string, record: string, key?: string} $elements */
         $elements = $this->xmlElements();
         $xmlData = $this->xmlBuilder->buildBatch(
             $elements['root'],
@@ -194,12 +190,11 @@ abstract class AbstractEndpoint implements Endpoint
     }
 
     /**
-     * Send a PUT request with XML data.
+     * Sends a PUT request with XML data.
      *
      * @param  string  $xmlData  The XML body
      * @param  array<string, mixed>  $extraContext  Additional context for errors
-     *
-     * @return array<int, array<string, mixed>> Parsed response
+     * @return array<int, array<string, mixed>>  Parsed response
      */
     protected function sendPutRequest(string $xmlData, array $extraContext = []): array
     {
@@ -210,7 +205,8 @@ abstract class AbstractEndpoint implements Endpoint
         ], $extraContext);
 
         // Validate request XML against input schema if enabled (using endpoint-defined schema)
-        if ($this->config->validateSchema && ($schema = $this->schemas()['put'] ?? null)) {
+        $schema = $this->schemas()['put'] ?? null;
+        if ($this->config->validateSchema && is_string($schema)) {
             $this->schemaRegistry->validateXml($xmlData, $schema, $context);
         }
 
@@ -229,7 +225,7 @@ abstract class AbstractEndpoint implements Endpoint
     }
 
     /**
-     * Send a PUT request with raw XML data.
+     * Sends a PUT request with raw XML data.
      *
      * Useful when you have pre-built XML or want to bypass the array-to-XML builder.
      *

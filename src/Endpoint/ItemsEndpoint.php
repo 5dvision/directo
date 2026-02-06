@@ -47,8 +47,6 @@ final class ItemsEndpoint extends AbstractEndpoint
 
     /**
      * {@inheritDoc}
-     *
-     * @return list<string>
      */
     public function allowedFilters(): array
     {
@@ -66,8 +64,6 @@ final class ItemsEndpoint extends AbstractEndpoint
 
     /**
      * {@inheritDoc}
-     *
-     * @return array{root: string, record: string, key: string}
      */
     public function xmlElements(): array
     {
@@ -80,8 +76,6 @@ final class ItemsEndpoint extends AbstractEndpoint
 
     /**
      * {@inheritDoc}
-     *
-     * @return array{list: string, put: string}
      */
     public function schemas(): array
     {

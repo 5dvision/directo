@@ -32,7 +32,7 @@ class SchemaValidationException extends DirectoException
     }
 
     /**
-     * Get libxml validation errors.
+     * Returns libxml validation errors.
      *
      * @return array<int, \LibXMLError>
      */
@@ -42,7 +42,7 @@ class SchemaValidationException extends DirectoException
     }
 
     /**
-     * Get formatted validation error messages.
+     * Returns formatted validation error messages.
      *
      * @return array<int, string>
      */
@@ -65,7 +65,7 @@ class SchemaValidationException extends DirectoException
     }
 
     /**
-     * Get the schema path used for validation.
+     * Returns the schema path used for validation.
      */
     public function getSchemaPath(): string
     {

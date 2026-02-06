@@ -28,7 +28,7 @@ final readonly class SchemaDownloader
      *
      * @param  string  $outputPath  Local directory to save schemas
      * @param  string  $schemaBaseUrl  Base URL for downloading schemas
-     * @param  ClientInterface|null  $httpClient  Optional HTTP client (for testing)
+     * @param  ClientInterface|null  $httpClient  Optional HTTP client
      */
     public function __construct(private string $outputPath, private string $schemaBaseUrl, private ?ClientInterface $httpClient = new Client([
         'timeout' => 30.0,
@@ -38,9 +38,9 @@ final readonly class SchemaDownloader
     }
 
     /**
-     * Ensure the output directory exists.
+     * Ensures the output directory exists.
      *
-     * @throws \RuntimeException If directory cannot be created
+     * @throws \RuntimeException
      */
     private function ensureOutputDirectory(): void
     {
@@ -56,22 +56,22 @@ final readonly class SchemaDownloader
     }
 
     /**
-     * Discover all endpoint classes that implement EndpointInterface.
+     * Discovers all endpoint classes that implement EndpointInterface.
      *
      * @return array<class-string<EndpointInterface>>
      */
     private function discoverEndpointClasses(): array
     {
-        $endpointDir = __DIR__.'/../Endpoint';
+        $endpointDir = __DIR__ . '/../Endpoint';
         $classes = [];
 
         if (! is_dir($endpointDir)) {
             return $classes;
         }
 
-        foreach (glob($endpointDir.'/*Endpoint.php') as $file) {
+        foreach (glob($endpointDir . '/*Endpoint.php') as $file) {
             $filename = basename($file, '.php');
-            $className = 'Directo\\Endpoint\\'.$filename;
+            $className = 'Directo\\Endpoint\\' . $filename;
 
             if (! class_exists($className)) {
                 continue;
@@ -92,6 +92,7 @@ final readonly class SchemaDownloader
                 continue;
             }
 
+            /** @var class-string<EndpointInterface> $className */
             $classes[] = $className;
         }
 
@@ -99,7 +100,7 @@ final readonly class SchemaDownloader
     }
 
     /**
-     * Get all schemas from endpoint classes.
+     * Returns all schemas from endpoint classes.
      *
      * @return array<int, array{file: string, url: string}>
      */
@@ -127,7 +128,7 @@ final readonly class SchemaDownloader
                 $seen[$schemaFile] = true;
                 $schemas[] = [
                     'file' => $schemaFile,
-                    'url' => $this->schemaBaseUrl.$schemaFile,
+                    'url' => $this->schemaBaseUrl . $schemaFile,
                 ];
             }
         }
@@ -136,7 +137,7 @@ final readonly class SchemaDownloader
     }
 
     /**
-     * Download all registered schemas.
+     * Downloads all registered schemas.
      *
      * @param  callable|null  $logger  Optional logger callback: fn(string $message): void
      * @return array{success: array<string, string>, failed: array<string, string>}
@@ -159,7 +160,7 @@ final readonly class SchemaDownloader
         foreach ($schemas as $schema) {
             $url = $schema['url'];
             $file = $schema['file'];
-            $targetPath = $this->outputPath.'/'.$file;
+            $targetPath = $this->outputPath . '/' . $file;
 
             $logger('Downloading: ' . $url);
 
@@ -178,7 +179,7 @@ final readonly class SchemaDownloader
                 $logger('  OK: Saved to ' . $file);
             } catch (GuzzleException $e) {
                 $results['failed'][$file] = $e->getMessage();
-                $logger('  ERROR: '.$e->getMessage());
+                $logger('  ERROR: ' . $e->getMessage());
             }
         }
 
@@ -186,17 +187,17 @@ final readonly class SchemaDownloader
     }
 
     /**
-     * Download a single schema by filename.
+     * Downloads a single schema by filename.
      *
      * @param  string  $schemaFile  The schema filename (e.g., 'ws_artiklid.xsd')
      * @return string Path to the downloaded file
      *
-     * @throws \RuntimeException On download/write failure
+     * @throws \RuntimeException
      */
     public function download(string $schemaFile): string
     {
-        $url = $this->schemaBaseUrl.$schemaFile;
-        $targetPath = $this->outputPath.'/'.$schemaFile;
+        $url = $this->schemaBaseUrl . $schemaFile;
+        $targetPath = $this->outputPath . '/' . $schemaFile;
 
         $this->ensureOutputDirectory();
 

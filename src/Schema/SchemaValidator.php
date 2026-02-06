@@ -14,14 +14,14 @@ use InvalidArgumentException;
 class SchemaValidator
 {
     /**
-     * Validate XML against a schema file.
+     * Validates XML against a schema file.
      *
      * @param  string  $xml  The XML content to validate
      * @param  string  $schemaPath  Full path to the schema file
      * @param  array<string, mixed>  $context  Context for error reporting
      *
-     * @throws SchemaValidationException If validation fails
-     * @throws InvalidArgumentException If schema file not found
+     * @throws SchemaValidationException
+     * @throws InvalidArgumentException
      */
     public function validate(
         string $xml,

@@ -13,15 +13,14 @@ use SimpleXMLElement;
 final class ArrayToXmlBuilder
 {
     /**
-     * Convert an array to an XML string.
+     * Converts an array to an XML string.
      *
-     * @param array<string, mixed> $data The array to convert
-     * @param string|null $rootElement The name of the root element (default: 'root')
-     * @param string $version The XML version (default: '1.0')
-     * @param string $encoding The XML encoding (default: 'utf-8')
-     * @param bool $pretty Whether to format the output with indentation and newlines (default: false)
-     *
-     * @return string The generated XML string
+     * @param  array<string, mixed>  $data  The array to convert
+     * @param  string|null  $rootElement  The name of the root element (default: 'root')
+     * @param  string  $version  The XML version
+     * @param  string  $encoding  The XML encoding
+     * @param  bool  $pretty  Whether to format the output with indentation and newlines
+     * @return string  The generated XML string
      */
     public static function arrayToXml(
         array $data,
@@ -43,8 +42,12 @@ final class ArrayToXmlBuilder
 
         $xmlString = $xml->asXML();
 
-        if ($pretty) {
+        if ($pretty && $xmlString !== false) {
             $xmlString = self::prettyPrint($xmlString);
+        }
+
+        if ($xmlString === false) {
+            $xmlString = '';
         }
 
         if ($rootElement !== null) {
@@ -59,7 +62,10 @@ final class ArrayToXmlBuilder
     }
 
     /**
-     * @param array<string, mixed> $data
+     * Recursively appends array data to the XML element.
+     *
+     * @param  array<string, mixed>  $data
+     * @param  SimpleXMLElement  $xml
      */
     private static function arrayToXmlRecursive(array $data, SimpleXMLElement &$xml): void
     {
@@ -80,7 +86,7 @@ final class ArrayToXmlBuilder
             }
 
             if ($key === '@value') {
-                $xml->{0} = self::sanitizeValue($value);
+                $xml[0] = self::sanitizeValue($value);
                 continue;
             }
 
@@ -105,7 +111,7 @@ final class ArrayToXmlBuilder
     }
 
     /**
-     * Sanitize a value for XML output.
+     * Sanitizes a value for XML output.
      *
      * @param mixed $value The value to sanitize
      *
@@ -123,7 +129,7 @@ final class ArrayToXmlBuilder
     }
 
     /**
-     * Format an XML string with indentation and newlines.
+     * Formats an XML string with indentation and newlines.
      *
      * @param string $xml The XML string to format
      *
@@ -140,15 +146,15 @@ final class ArrayToXmlBuilder
     }
 
     /**
-     * Validate XML against an XSD schema.
+     * Validates XML against an XSD schema.
      *
      * @param string $xml The XML string to validate
      * @param string $xsdPath The path to the XSD schema file
      *
      * @return bool True if validation passes
      *
-     * @throws \Directo\Exception\SchemaValidationException If validation fails
-     * @throws \InvalidArgumentException If schema file is not found
+     * @throws \Directo\Exception\SchemaValidationException
+     * @throws \InvalidArgumentException
      */
     public static function validateXml(string $xml, string $xsdPath): bool
     {

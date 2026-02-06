@@ -36,7 +36,7 @@ class DirectoException extends Exception
     }
 
     /**
-     * Get debugging context.
+     * Returns debugging context.
      *
      * Context includes endpoint info and filters but NEVER auth credentials.
      *

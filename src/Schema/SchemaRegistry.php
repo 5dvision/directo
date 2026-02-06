@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Directo\Schema;
 
 use Directo\Exception\SchemaValidationException;
-use DOMDocument;
 
 /**
  * Schema validator for XSD validation.
@@ -44,7 +43,7 @@ final readonly class SchemaRegistry
     }
 
     /**
-     * Get the base path for schema files (local directory).
+     * Returns the base path for schema files (local directory).
      *
      * @return string Local directory path
      */
@@ -54,7 +53,7 @@ final readonly class SchemaRegistry
     }
 
     /**
-     * Get the base URL for downloading schemas.
+     * Returns the base URL for downloading schemas.
      *
      * @return string Base URL for schema downloads
      */
@@ -64,7 +63,7 @@ final readonly class SchemaRegistry
     }
 
     /**
-     * Get full path to a schema file.
+     * Returns full path to a schema file.
      *
      * @param  string  $schemaFile  Schema filename (e.g., 'ws_artiklid.xsd')
      * @return string Full local path to the schema file
@@ -79,7 +78,7 @@ final readonly class SchemaRegistry
     }
 
     /**
-     * Check if a schema file exists locally.
+     * Checks if a schema file exists locally.
      *
      * @param  string  $schemaFile  Schema filename
      * @return bool True if file exists
@@ -90,7 +89,7 @@ final readonly class SchemaRegistry
     }
 
     /**
-     * Get the download URL for a schema file.
+     * Returns the download URL for a schema file.
      *
      * @param  string  $schemaFile  Schema filename
      * @return string Full URL to download the schema
@@ -101,14 +100,14 @@ final readonly class SchemaRegistry
     }
 
     /**
-     * Validate XML against a schema file.
+     * Validates XML against a schema file.
      *
      * @param  string  $xml  The XML content to validate
      * @param  string  $schemaFile  The schema filename (e.g., 'ws_artiklid.xsd')
      * @param  array<string, mixed>  $context  Context for error reporting
      *
-     * @throws SchemaValidationException If validation fails
-     * @throws \InvalidArgumentException If schema file not found
+     * @throws SchemaValidationException
+     * @throws \InvalidArgumentException
      */
     public function validateXml(
         string $xml,

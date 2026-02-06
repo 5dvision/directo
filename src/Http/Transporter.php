@@ -38,8 +38,10 @@ final readonly class Transporter implements TransporterContract
     }
 
     /**
-     * @param array<string, string|int> $formParams
-     * @param array<string, mixed> $context
+     * @param array<string, string|int> $formParams Form parameters
+     * @param array<string, mixed> $context Context
+     * @throws TransportException If the request fails
+     * @return string Response body
      */
     public function post(array $formParams, array $context = []): string
     {
@@ -78,6 +80,11 @@ final readonly class Transporter implements TransporterContract
         }
     }
 
+    /**
+     * @param ResponseInterface $response Response
+     * @param array<string, mixed> $context Context
+     * @return string Response body
+     */
     private function handleResponse(ResponseInterface $response, array $context): string
     {
         $statusCode = $response->getStatusCode();
@@ -90,6 +97,12 @@ final readonly class Transporter implements TransporterContract
         return $body;
     }
 
+    /**
+     * Logs request parameters.
+     *
+     * @param  array<string, string|int>  $formParams
+     * @param  array<string, mixed>  $context
+     */
     private function logRequest(array $formParams, array $context): void
     {
         $safeParams = $formParams;
@@ -104,6 +117,15 @@ final readonly class Transporter implements TransporterContract
         ]);
     }
 
+    /**
+     * Log response parameters.
+     *
+     * @param ResponseInterface $response Response
+     * @param string $body Response body
+     * @param float $startTime Start time
+     * @param array<string, mixed> $context Context
+     * @return void
+     */
     private function logResponse(ResponseInterface $response, string $body, float $startTime, array $context): void
     {
         $duration = round((microtime(true) - $startTime) * 1000, 2);
@@ -124,6 +146,15 @@ final readonly class Transporter implements TransporterContract
         }
     }
 
+    /**
+     * Logs error parameters.
+     *
+     * @param string $message Error message
+     * @param \Throwable $exception Exception
+     * @param float $startTime Start time
+     * @param array<string, mixed> $context Context
+     * @return void
+     */
     private function logError(string $message, \Throwable $exception, float $startTime, array $context): void
     {
         $duration = round((microtime(true) - $startTime) * 1000, 2);

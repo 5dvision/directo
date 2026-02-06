@@ -32,7 +32,7 @@ class HttpException extends DirectoException
     }
 
     /**
-     * Get the HTTP status code.
+     * Returns the HTTP status code.
      *
      * @return int HTTP status code
      */
@@ -42,7 +42,7 @@ class HttpException extends DirectoException
     }
 
     /**
-     * Get the raw response body (may be empty).
+     * Returns the raw response body (may be empty).
      *
      * @return string Response body
      */

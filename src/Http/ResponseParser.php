@@ -20,7 +20,7 @@ final readonly class ResponseParser
     }
 
     /**
-     * Parse XML response into array of records.
+     * Parses XML response into array of records.
      *
      * @param  string  $xml  Raw XML response
      * @param  array<string, mixed>  $context  Context for error reporting
@@ -60,7 +60,8 @@ final readonly class ResponseParser
     }
 
     /**
-     * Extract records from root element.
+     * Extracts records from root element.
+     *
      * @return array<int, array<string, mixed>>
      */
     private function extractRecords(DOMElement $root): array
@@ -156,7 +157,7 @@ final readonly class ResponseParser
         $result = [];
 
         foreach ($element->attributes ?? [] as $attr) {
-            $result['@'.$attr->nodeName] = $this->normalizeValue($attr->nodeValue);
+            $result['@' . $attr->nodeName] = $this->normalizeValue($attr->nodeValue);
         }
 
         $childrenByName = [];
@@ -188,6 +189,13 @@ final readonly class ResponseParser
         return $result;
     }
 
+    /**
+     * Checks if parent is a plural container of child.
+     *
+     * @param  string  $parentName  Parent element name
+     * @param  string  $childName  Child element name
+     * @return bool
+     */
     private function isPluralContainer(string $parentName, string $childName): bool
     {
         if (str_ends_with($parentName, 's') && !str_ends_with($parentName, 'ss')) {
@@ -207,6 +215,13 @@ final readonly class ResponseParser
         return false;
     }
 
+    /**
+     * Extracts value from element.
+     *
+     * @param DOMElement $element Element to extract value from
+     *
+     * @return array<string, mixed>|string|null
+     */
     private function extractValue(DOMElement $element): mixed
     {
         $hasChildElements = false;

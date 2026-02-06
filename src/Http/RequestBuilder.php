@@ -16,7 +16,14 @@ final class RequestBuilder
     private const ATTRIBUTES_KEY = '@attributes';
 
     /**
-     * @param array<string, mixed> $data
+     * Builds an XML string from an array.
+     *
+     * @param  string  $rootElement  Root element name
+     * @param  string  $recordElement  Record element name
+     * @param  array<string, mixed>  $data  Data to build XML from
+     * @param  ?string  $keyAttribute  Key attribute name
+     *
+     * @return string XML string or empty string on failure
      */
     public function build(
         string $rootElement,
@@ -46,7 +53,14 @@ final class RequestBuilder
     }
 
     /**
-     * @param array<int, array<string, mixed>> $records
+     * Builds an XML string from an array of records.
+     *
+     * @param  string  $rootElement  Root element name
+     * @param  string  $recordElement  Record element name
+     * @param  array<int, array<string, mixed>>  $records  Records to build XML from
+     * @param  ?string  $keyAttribute  Key attribute name
+     *
+     * @return string XML string or empty string on failure
      */
     public function buildBatch(
         string $rootElement,
@@ -78,7 +92,11 @@ final class RequestBuilder
     }
 
     /**
-     * @param array<string, mixed> $data
+     * Recursively adds elements to the DOM.
+     *
+     * @param  DOMDocument  $dom  DOM document
+     * @param  DOMElement  $parent  Parent element
+     * @param  array<string, mixed>  $data  Data to add
      */
     private function addElements(DOMDocument $dom, DOMElement $parent, array $data): void
     {
@@ -118,6 +136,12 @@ final class RequestBuilder
         }
     }
 
+    /**
+     * Checks if array is numerically indexed.
+     *
+     * @param  array<mixed>  $array
+     * @return bool
+     */
     private function isNumericArray(array $array): bool
     {
         if ($array === []) {
@@ -127,6 +151,12 @@ final class RequestBuilder
         return array_keys($array) === range(0, count($array) - 1);
     }
 
+    /**
+     * Formats value for XML.
+     *
+     * @param mixed $value Value to format
+     * @return string Formatted value
+     */
     private function formatValue(mixed $value): string
     {
         if ($value instanceof Stringable) {

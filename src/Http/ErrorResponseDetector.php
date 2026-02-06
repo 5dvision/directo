@@ -43,6 +43,12 @@ final class ErrorResponseDetector
         'viga',
     ];
 
+    /**
+     * Detects and throws exception if the XML contains an error.
+     *
+     * @param string $xml The XML string to check
+     * @param array<string, mixed> $context The context to pass to the exception
+     */
     public function detectAndThrow(string $xml, array $context = []): void
     {
         if (trim($xml) === '') {
@@ -70,13 +76,13 @@ final class ErrorResponseDetector
         $xmlLower = strtolower($xml);
 
         foreach (self::ERROR_ELEMENTS as $element) {
-            if (str_contains($xmlLower, '<'.$element)) {
+            if (str_contains($xmlLower, '<' . $element)) {
                 return true;
             }
         }
 
         foreach (self::ERROR_ATTRIBUTES as $attr) {
-            if (str_contains($xmlLower, $attr.'=')) {
+            if (str_contains($xmlLower, $attr . '=')) {
                 return true;
             }
         }
@@ -88,6 +94,9 @@ final class ErrorResponseDetector
         return str_contains($xmlLower, '<result');
     }
 
+    /**
+     * @return array<string>
+     */
     private function extractErrors(string $xml): array
     {
         $previousUseErrors = libxml_use_internal_errors(true);
@@ -148,6 +157,9 @@ final class ErrorResponseDetector
         return in_array($nameLower, self::ERROR_ELEMENTS, true);
     }
 
+    /**
+     * @return array<string>
+     */
     private function extractAttributeErrors(DOMElement $element): array
     {
         $errors = [];
@@ -179,6 +191,9 @@ final class ErrorResponseDetector
         return array_filter($errors);
     }
 
+    /**
+     * @return array<string>
+     */
     private function extractXPathErrors(DOMXPath $xpath): array
     {
         $errors = [];
@@ -235,6 +250,12 @@ final class ErrorResponseDetector
         return '';
     }
 
+    /**
+     * Extracts errors from the status element.
+     *
+     * @param DOMXPath $xpath The DOMXPath object
+     * @return array<string>
+     */
     private function extractStatusErrors(DOMXPath $xpath): array
     {
         $errors = [];
@@ -254,6 +275,9 @@ final class ErrorResponseDetector
         return $errors;
     }
 
+    /**
+     * @return array<string>
+     */
     private function extractResultErrors(DOMXPath $xpath): array
     {
         $errors = [];
@@ -282,6 +306,12 @@ final class ErrorResponseDetector
         return $errors;
     }
 
+    /**
+     * Builds a message from the errors.
+     *
+     * @param array<string> $errors
+     * @return string The message
+     */
     private function buildMessage(array $errors): string
     {
         if ($errors === []) {
@@ -295,7 +325,7 @@ final class ErrorResponseDetector
         return sprintf(
             'Directo API returned %d errors: %s',
             count($errors),
-            implode('; ', array_slice($errors, 0, 3)).(count($errors) > 3 ? '...' : ''),
+            implode('; ', array_slice($errors, 0, 3)) . (count($errors) > 3 ? '...' : ''),
         );
     }
 }
