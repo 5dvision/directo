@@ -23,19 +23,34 @@ describe('RequestBuilder', function (): void {
         expect($xml)->toContain('</artiklid>');
     });
 
-    test('builds customer XML with code as attribute', function (): void {
+    test('builds customer XML with schema attribute names', function (): void {
         $builder = new RequestBuilder();
 
-        $xml = $builder->build('kliendid', 'klient', [
-            'kood' => 'CUST001',
-            'nimi' => 'Test Customer',
-        ], 'kood');
+        $xml = $builder->build('customers', 'customer', [
+            '@attributes' => [
+                'code' => 'CUST001',
+                'name' => 'Test Customer',
+                'email' => 'test@example.com',
+            ],
+            'datafields' => [
+                'data' => [
+                    [
+                        '@attributes' => [
+                            'code' => 'vip',
+                            'content' => 'yes',
+                            'param' => 'segment',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
-        expect($xml)->toContain('<kliendid>');
-        expect($xml)->toContain('<klient kood="CUST001">');
-        expect($xml)->toContain('<nimi>Test Customer</nimi>');
-        expect($xml)->toContain('</klient>');
-        expect($xml)->toContain('</kliendid>');
+        expect($xml)->toContain('<customers>');
+        expect($xml)->toContain('<customer code="CUST001" name="Test Customer" email="test@example.com">');
+        expect($xml)->toContain('<datafields>');
+        expect($xml)->toContain('<data code="vip" content="yes" param="segment"/>');
+        expect($xml)->toContain('</customer>');
+        expect($xml)->toContain('</customers>');
     });
 
     test('builds XML without key attribute when not specified', function (): void {

@@ -18,19 +18,22 @@ namespace Directo\Endpoint;
  * - closed: Include closed customers (0 or 1)
  * - ts: Timestamp filter for incremental sync
  *
- * Response structure (array keys per record):
- * - kood: Customer code
- * - nimi: Customer name
- * - email: Email address
- * - telefon: Phone number
- * - registrikood: Registration number
- * - aadress: Address
- * - linn: City
- * - postiindex: Postal code
- * - riik: Country code
- * - kliendiryhm: Customer group
- * - hinnaklass: Price class
+ * Response structure (parsed array keys per record):
+ * - @code: Customer code
+ * - @name: Customer name
+ * - @email: Email address
+ * - @phone: Phone number
+ * - @regno: Registration number
+ * - @address1: Address line 1
+ * - @address2: Address line 2 / city depending on Directo setup
+ * - @country: Country code
+ * - @closed: Closed flag
+ * - datafields: Nested custom fields container
  * - ...and more depending on Directo configuration
+
+ * PUT payloads must follow the Directo IN schema, which uses English
+ * attribute names on <customer> plus optional nested containers such as
+ * <datafields>.
  *
  * @see https://wiki.directo.ee/et/xmlcore_xml
  */

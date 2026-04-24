@@ -40,12 +40,13 @@ test('lists items', function () {
     // 1. Create the mock response
     $mockXml = <<<XML
     <?xml version="1.0" encoding="UTF-8"?>
-    <results>
-      <item>
-        <kood>ITEM001</kood>
-        <nimetus>Test Product</nimetus>
-      </item>
-    </results>
+        <transport>
+            <items>
+                <item code="ITEM001" name="Test Product" class="SERVICES">
+                    <datafields/>
+                </item>
+            </items>
+        </transport>
     XML;
 
     $mock = new MockHandler([
@@ -66,7 +67,8 @@ test('lists items', function () {
     $items = $client->items()->list();
 
     expect($items)->toBeArray();
-    expect($items[0]['kood'])->toBe('ITEM001');
+    expect($items[0]['@code'])->toBe('ITEM001');
+    expect($items[0]['@name'])->toBe('Test Product');
 });
 ```
 
@@ -74,11 +76,15 @@ test('lists items', function () {
 
 ```php
 test('creates item', function () {
+    $history = [];
+    $historyMiddleware = Middleware::history($history);
+
     $mock = new MockHandler([
         new Response(200, [], '<results><ok/></results>'),
     ]);
     
     $handlerStack = HandlerStack::create($mock);
+    $handlerStack->push($historyMiddleware);
     $httpClient = new GuzzleClient(['handler' => $handlerStack]);
     
     $config = new Config(token: 'test-token');
@@ -86,17 +92,21 @@ test('creates item', function () {
     $client = new Client($config, $transport);
 
     $result = $client->items()->put([
-        'kood' => 'ITEM001',
-        'nimetus' => 'New Product',
+        '@attributes' => [
+            'code' => 'ITEM001',
+            'name' => 'New Product',
+            'class' => 'SERVICES',
+        ],
     ]);
 
     expect($result)->toHaveKey('ok');
     
     // Verify sent request body
-    $lastRequest = $mock->getLastRequest();
-    exit($lastRequest->getBody()->getContents()); // Or inspect it
-    $sentBody = urldecode((string) $lastRequest->getBody());
-    expect($sentBody)->toContain('<artikkel kood="ITEM001">');
+    $sentBody = (string) $history[0]['request']->getBody();
+    parse_str($sentBody, $params);
+
+    expect($params['what'])->toBe('item');
+    expect($params['xmldata'])->toContain('<item code="ITEM001" name="New Product" class="SERVICES">');
 });
 ```
 

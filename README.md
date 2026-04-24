@@ -38,7 +38,18 @@ $items = $client->items()->list([
     'class' => 'ELECTRONICS',
     'ts' => '12.01.2026',
 ]);
+
+// Create or update a customer using the Directo IN schema shape
+$client->customers()->put([
+    '@attributes' => [
+        'code' => 'CUST001',
+        'name' => 'Acme OU',
+        'email' => 'info@example.com',
+    ],
+]);
 ```
+
+For `put()` and `putBatch()`, use Directo IN schema names and `@attributes` on the record node. Parsed `list()` responses come back as XML attributes with `@` prefixes such as `@code` and `@name`.
 
 ## Documentation
 

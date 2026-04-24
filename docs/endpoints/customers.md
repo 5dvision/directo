@@ -41,12 +41,28 @@ Use the `put()` method to create or update a customer (upsert):
 
 ```php
 $result = $client->customers()->put([
-    'kood' => 'CUST001',        // Required: Customer code (key)
-    'nimi' => 'Test Customer',  // Customer name
-    'email' => 'test@test.com', // Email
-    'telefon' => '+372555',     // Phone
+    '@attributes' => [
+        'code' => 'CUST001',
+        'name' => 'Test Customer',
+        'email' => 'test@test.com',
+        'phone' => '+372555',
+        'regno' => '12345678',
+    ],
+    'datafields' => [
+        'data' => [
+            [
+                '@attributes' => [
+                    'code' => 'vip',
+                    'content' => 'yes',
+                    'param' => 'segment',
+                ],
+            ],
+        ],
+    ],
 ]);
 ```
+
+For customer `put()` requests, the Directo IN schema expects English attribute names on `<customer>` such as `code`, `name`, `email`, and `phone`. Estonian OUT field names like `kood` and `nimi` are not valid request keys for this SDK contract.
 
 ### Batch Operations
 
@@ -54,53 +70,75 @@ Create or update multiple customers:
 
 ```php
 $result = $client->customers()->putBatch([
-    ['kood' => 'CUST001', 'nimi' => 'Customer 1'],
-    ['kood' => 'CUST002', 'nimi' => 'Customer 2'],
+    [
+        '@attributes' => [
+            'code' => 'CUST001',
+            'name' => 'Customer 1',
+        ],
+    ],
+    [
+        '@attributes' => [
+            'code' => 'CUST002',
+            'name' => 'Customer 2',
+        ],
+    ],
 ]);
 ```
 
 ## Response Fields
 
-The API returns these fields (among others, depending on Directo configuration):
+The parsed response returns XML attributes with an `@` prefix (among others, depending on Directo configuration):
 
 | Field | Description |
 |-------|-------------|
-| `kood` | Customer code |
-| `nimi` | Customer name |
-| `email` | Email address |
-| `telefon` | Phone number |
-| `registrikood` | Registration number |
-| `aadress` | Address |
-| `linn` | City |
-| `postiindex` | Postal code |
-| `riik` | Country code |
-| `kliendiryhm` | Customer group |
-| `hinnaklass` | Price class |
-| `suletud` | Closed flag (0/1) |
+| `@code` | Customer code |
+| `@name` | Customer name |
+| `@email` | Email address |
+| `@phone` | Phone number |
+| `@regno` | Registration number |
+| `@address1` | Address line 1 |
+| `@address2` | Address line 2 or city |
+| `@country` | Country code |
+| `@closed` | Closed flag (0/1) |
+| `@ts` | Timestamp |
+| `datafields` | Nested custom field container |
 
 ## XML Structure
 
 ### Input (PUT)
 
 ```xml
-<kliendid>
-  <klient kood="CUST001">
-    <nimi>Customer Name</nimi>
-    <email>test@test.com</email>
-  </klient>
-</kliendid>
+<customers>
+  <customer code="CUST001" name="Customer Name" email="test@test.com" phone="+372555">
+    <datafields>
+      <data code="vip" content="yes" param="segment"/>
+    </datafields>
+  </customer>
+</customers>
 ```
 
 ### Output (GET)
 
 ```xml
-<results>
-  <customer>
-    <kood>CUST001</kood>
-    <nimi>Customer Name</nimi>
-    <email>test@test.com</email>
-  </customer>
-</results>
+<transport>
+  <customers>
+    <customer code="CUST001" name="Customer Name" email="test@test.com" phone="+372555">
+      <datafields/>
+    </customer>
+  </customers>
+</transport>
+```
+
+Parsed by the SDK, that record becomes roughly:
+
+```php
+[
+    '@code' => 'CUST001',
+    '@name' => 'Customer Name',
+    '@email' => 'test@test.com',
+    '@phone' => '+372555',
+    'datafields' => [],
+]
 ```
 
 ## Schema Files

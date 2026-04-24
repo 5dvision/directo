@@ -175,4 +175,52 @@ describe('Request Building', function (): void {
         expect($body)->toContain('what=item');
         expect($body)->toContain('class=ELECTRONICS');
     });
+
+    test('customers put sends xmldata using schema attribute names', function (): void {
+        $history = [];
+        $historyMiddleware = Middleware::history($history);
+
+        $mock = new MockHandler([
+            new Response(200, [], fixture('transport-single-record.xml')),
+        ]);
+
+        $stack = HandlerStack::create($mock);
+        $stack->push($historyMiddleware);
+
+        $client = new GuzzleClient(['handler' => $stack]);
+        $config = new Config(token: 'test-key');
+        $transport = new Transporter($config, $client);
+        $endpoint = makeEndpoint(CustomersEndpoint::class, $config, $transport);
+
+        $endpoint->put([
+            '@attributes' => [
+                'code' => 'CUST001',
+                'name' => 'Test Customer',
+                'email' => 'test@example.com',
+            ],
+            'datafields' => [
+                'data' => [
+                    [
+                        '@attributes' => [
+                            'code' => 'vip',
+                            'content' => 'yes',
+                            'param' => 'segment',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        expect($history)->toHaveCount(1);
+
+        $body = (string) $history[0]['request']->getBody();
+        parse_str($body, $params);
+
+        expect($params)->toHaveKey('put', '1');
+        expect($params)->toHaveKey('what', 'customer');
+        expect($params)->toHaveKey('xmldata');
+        expect($params['xmldata'])->toContain('<customers>');
+        expect($params['xmldata'])->toContain('<customer code="CUST001" name="Test Customer" email="test@example.com">');
+        expect($params['xmldata'])->toContain('<data code="vip" content="yes" param="segment"/>');
+    });
 });

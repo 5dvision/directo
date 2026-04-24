@@ -42,12 +42,16 @@ Use the `put()` method to create or update an item (upsert):
 
 ```php
 $result = $client->items()->put([
-    'kood' => 'ITEM001',        // Required: Item code (key)
-    'nimetus' => 'New Product', // Item name
-    'klass' => 'ELECTRONICS',   // Item class
-    'hind' => 99.99,            // Price
+    '@attributes' => [
+        'code' => 'ITEM001',
+        'name' => 'New Product',
+        'class' => 'ELECTRONICS',
+        'salesprice' => 99.99,
+    ],
 ]);
 ```
+
+For item `put()` requests, the Directo IN schema expects English attribute names on `<item>` such as `code`, `name`, `class`, and `salesprice`. Estonian OUT field names like `kood`, `nimetus`, and `hind` are not valid request keys for this SDK contract.
 
 ### Batch Operations
 
@@ -55,56 +59,73 @@ Create or update multiple items:
 
 ```php
 $result = $client->items()->putBatch([
-    ['kood' => 'ITEM001', 'nimetus' => 'Product 1', 'hind' => 10.00],
-    ['kood' => 'ITEM002', 'nimetus' => 'Product 2', 'hind' => 20.00],
-    ['kood' => 'ITEM003', 'nimetus' => 'Product 3', 'hind' => 30.00],
+    [
+        '@attributes' => [
+            'code' => 'ITEM001',
+            'name' => 'Product 1',
+            'salesprice' => 10.00,
+        ],
+    ],
+    [
+        '@attributes' => [
+            'code' => 'ITEM002',
+            'name' => 'Product 2',
+            'salesprice' => 20.00,
+        ],
+    ],
+    [
+        '@attributes' => [
+            'code' => 'ITEM003',
+            'name' => 'Product 3',
+            'salesprice' => 30.00,
+        ],
+    ],
 ]);
 ```
 
 ## Response Fields
 
-The API returns these fields (among others, depending on Directo configuration):
+The parsed response returns XML attributes with an `@` prefix (among others, depending on Directo configuration):
 
 | Field | Description |
 |-------|-------------|
-| `kood` | Item code |
-| `nimetus` | Item name |
-| `nimetus2` | Alternative name |
-| `klass` | Item class |
-| `yksus` | Unit of measure |
-| `ribakood` | Barcode |
-| `hind` | Price |
-| `kaal` | Weight |
-| `maht` | Volume |
-| `tarnija` | Supplier code |
-| `tarnija_artikkel` | Supplier's item code |
-| `suletud` | Closed flag (0/1) |
+| `@code` | Item code |
+| `@name` | Item name |
+| `@class` | Item class |
+| `@barcode` | Barcode |
+| `@salesprice` | Sales price without VAT |
+| `@weight` | Weight |
+| `@volume` | Volume |
+| `@supplier` | Supplier code |
+| `@supplieritem` | Supplier's item code |
+| `@closed` | Closed flag (0/1) |
+| `datafields` | Nested custom field container |
 
 ## XML Structure
 
 ### Input (PUT)
 
 ```xml
-<artiklid>
-  <artikkel kood="ITEM001">
-    <nimetus>Product Name</nimetus>
-    <klass>ELECTRONICS</klass>
-    <hind>99.99</hind>
-  </artikkel>
-</artiklid>
+<items>
+  <item code="ITEM001" name="Product Name" class="ELECTRONICS" salesprice="99.99">
+    <datafields/>
+    <packages/>
+    <supplieritems/>
+    <stocklimits/>
+  </item>
+</items>
 ```
 
 ### Output (GET)
 
 ```xml
-<results>
-  <item>
-    <kood>ITEM001</kood>
-    <nimetus>Product Name</nimetus>
-    <klass>ELECTRONICS</klass>
-    <hind>99.99</hind>
-  </item>
-</results>
+<transport>
+  <items>
+    <item code="ITEM001" name="Product Name" class="ELECTRONICS" salesprice="99.99">
+      <datafields/>
+    </item>
+  </items>
+</transport>
 ```
 
 ## Schema Files
